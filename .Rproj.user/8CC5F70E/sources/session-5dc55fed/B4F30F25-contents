@@ -1,7 +1,7 @@
 Package: sheetcheatR
 Type: Package
 Title: Exercises for RStudio's cheatsheets.
-Version: 0.1.1
+Version: 1.1.1
 Author: Martin Frigaard
 Maintainer: Martin Frigaard <mjfrigaard@pm.me>
 Description: This package contains learnr tutorials from RStudio's cheatsheets. 

@@ -1,24 +1,24 @@
 {
-    "id": "B4F30F25",
-    "path": "~/projects/sheetcheatR/DESCRIPTION",
-    "project_path": "DESCRIPTION",
-    "type": "dcf",
-    "hash": "1130344360",
+    "id": "111681BC",
+    "path": "~/projects/sheetcheatR/NEWS.md",
+    "project_path": "NEWS.md",
+    "type": "markdown",
+    "hash": "3624874086",
     "contents": "",
     "dirty": false,
-    "created": 1680040053787.0,
+    "created": 1680065975869.0,
     "source_on_save": false,
-    "relative_order": 2,
+    "relative_order": 5,
     "properties": {
         "source_window_id": "",
         "Source": "Source"
     },
     "folds": "",
-    "lastKnownWriteTime": 1680065963,
+    "lastKnownWriteTime": 1680066002,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1680065963323,
+    "last_content_update": 1680066002040,
     "read_only": false,
     "read_only_alternatives": []
 }
