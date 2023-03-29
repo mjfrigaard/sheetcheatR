@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-The goal of `sheetcheatR` is to provide R exercises modeled after RStudio's excellent cheatsheets. Check them out [here](https://www.rstudio.com/resources/cheatsheets/).
+The goal of `sheetcheatR` is to provide R exercises modeled after RStudio's excellent cheatsheets. Check them out [here](https://www.rstudio.com/resources/cheatsheets/). This package was inspired by Mine Cetinkaya-Rundel's [Accessible Cheatsheets] (https://github.com/mine-cetinkaya-rundel/accessible-cheatsheets) project.
 
 ## Installation
 
