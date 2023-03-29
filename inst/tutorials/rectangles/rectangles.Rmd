@@ -1,0 +1,1905 @@
+---
+title: "Rectangular data in R"
+description: >
+  Learn about `data.frames`, `tibbles`, and `data.table`s--three forms of rectangular data in R.
+output: 
+  learnr::tutorial:
+    highlight: tango
+    theme: bootstrap
+    ace_theme: monokai
+    progressive: true
+    allow_skip: true
+    df_print: default
+    
+runtime: shiny_prerendered
+
+---
+
+```{r setup, include = FALSE}
+library(learnr)
+library(rmdformats)
+library(tidyverse)
+library(skimr)
+library(knitr)
+library(gradethis)
+library(data.table)
+knitr::opts_chunk$set(error = TRUE,
+                      upload.fun = imgur_upload, 
+                      fig.path = "www/",
+                      collapse = TRUE,
+                      exercise.cap = "rectangular in R",
+                      warning = FALSE, 
+                      message = FALSE, 
+                      dpi = 96,
+                      tibble.max_extra_cols = 6, 
+                      tibble.width = 60)
+options(scipen = 999999999)
+gradethis::gradethis_setup(exercise.reveal_solution = TRUE)
+```
+
+```{r prepare-vectors, eval=TRUE, echo=FALSE}
+log_vec <- c(TRUE, FALSE, TRUE, FALSE)
+int_vec <- seq(1:4)
+dbl_vec <- 1.1:4.1
+chr_vec <- c("a", "b", "c", "d")
+dat_vec <- c(Sys.Date(),
+  Sys.Date() + 1,
+  Sys.Date() + 2,
+  Sys.Date() + 3)
+dtt_vec <- c(Sys.time(),
+  Sys.time() + 86400,
+  Sys.time() + (2 * 86400),
+  Sys.time() + (3 * 86400))
+dft_vec <- c(
+  difftime(
+    time1 = Sys.time(),
+    time2 = Sys.time() + (2 * 86400),
+    units = "days"
+  ),
+  difftime(
+    time1 = Sys.time(),
+    time2 = Sys.time() + (3 * 86400),
+    units = "days"
+  ),
+  difftime(
+    time1 = Sys.time(),
+    time2 = Sys.time() + (4 * 86400),
+    units = "days"
+  ),
+  difftime(
+    time1 = Sys.time(),
+    time2 = Sys.time() + (5 * 86400),
+    units = "days"
+  )
+)
+fct_vec <- factor(
+  x = c("never", "rarely", "often", "always"),
+  levels = c("never", "rarely", "often", "always"),
+  ordered = TRUE
+)
+```
+
+
+## Overview 
+
+The following tutorial covers R's rectangular data objects. If you're used to seeing data in a table structure (like a spreadsheet with rows and columns), R's emphasis on vectors might seem strange. The exercises in this tutorial should provide a basic roadmap for how we get from single values, storing values in vectors, and using vectors to build complex datasets. 
+
+Tutorial topics include:
+
+1. Values & `vectors` (review)
+1. The `matrix`: a basic two-dimensional object
+2. The `list`: a flexible, recursive structure  
+2. A rectangular list (aka the `data.frame`)  
+3. A modern update: the `tibble`  
+4. `data.table`
+
+###
+
+Rectangular data are covered in multiple cheatsheets in R. The [base R cheat sheet](http://github.com/rstudio/cheatsheets/blob/main/base-r.pdf) has a section on the `data.frame`, the [`tidyr`](https://raw.githubusercontent.com/rstudio/cheatsheets/main/tidyr.pdf) cheat sheet covers an introduction to the `tibble` (the tidyverse implementation of a `data.frame`) and the `data.table` package has it's own [cheat sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/datatable.pdf).
+
+
+### Values and vectors (quick review)
+
+Data are made up of a collection of values. Values come in all shapes and sizes, but they all quantify, measure, or classify of *something*. Below are some examples:
+
+<br>
+
+```{r values, echo=FALSE, out.height='95%', out.width='95%', fig.align='center'}
+knitr::include_graphics(path = "www/values.png")
+```
+
+###
+
+If we're creating (or importing) values into R, we need a way to store them. In R, the vector is the fundamental data object. 
+
+```{r vector, echo=FALSE, out.height='40%', out.width='40%', fig.align='center'}
+knitr::include_graphics(path = "www/vector.png")
+```
+
+###
+
+Values get stored in vectors according to their `class` (or `mode`). For example, whole numbers are stored in integer vectors:
+
+```{r integer-vector-png, echo=FALSE, out.height='100%', out.width='100%', fig.align='center'}
+knitr::include_graphics(path = "www/integer-vector.png")
+```
+
+```{r}
+int_vec <- seq(1:4)
+int_vec
+class(int_vec)
+```
+
+
+###
+
+And ranked classifications are stored in ordered factors, 
+
+```{r factor-vector-png, echo=FALSE, out.height='100%', out.width='100%', fig.align='center'}
+knitr::include_graphics(path = "www/factor-vector.png")
+```
+
+```{r fct_vec}
+fct_vec <- factor(
+  x = c("never", "rarely", "often", "always"),
+  levels = c("never", "rarely", "often", "always"),
+  ordered = TRUE
+)
+fct_vec
+class(fct_vec)
+```
+
+
+###
+
+Vector can be simple (atomic) or complex (S3). S3 vectors are built 'on-top' of atomic vectors, but have additional classes and attributes (like `"Date"`, `ordered`, `levels`, etc.). 
+
+
+```{r vector-types-png, echo=FALSE, out.height='100%', out.width='100%', fig.align='center'}
+knitr::include_graphics(path = "www/vector-types.png")
+```
+
+###
+
+For example, datetime vectors have two classes (`"POSIXct"` and `"POSIXt"`), which are listed in the attributes along with `tzone`.
+
+```{r s3_vectors_01, eval=TRUE, echo=TRUE}
+# seconds_per_day
+sec_per_day <- 86400
+# datetime vector
+dtt_vec <- c(Sys.time(), Sys.time() + sec_per_day)
+dtt_vec
+class(dtt_vec)
+attributes(dtt_vec)
+```
+
+###
+
+And difftimes have their own class (`"difftime"`) which is listed in the attributes along with `"units"`.
+
+```{r s3_vectors_02, eval=TRUE, echo=TRUE}
+# difftime vector
+dft_vec <- difftime(time1 = Sys.Date() - 7,
+                    time2 = Sys.Date(), 
+                    units = "weeks")
+dft_vec
+class(dft_vec)
+attributes(dft_vec)
+```
+
+###
+
+One of the limitations of vectors is that they have only get ***longer***. We can add more values, but this only extends the `length()` of the vector.
+
+
+###
+
+```{r length-vec, eval=TRUE, echo=TRUE}
+# 1 through 5
+small_int_vec <- seq(1:5)
+# 1 though 10
+med_int_vec <- seq(1:10)
+# check length
+length(x = small_int_vec)
+length(x = med_int_vec)
+# combine and re-check length
+big_int_vec <- c(small_int_vec, med_int_vec)
+length(x = big_int_vec)
+```
+
+###
+
+Unlike data in a spreadsheet, vectors only come in one dimension, which is why the `dim()` function returns a `NULL` value when applied to a vector. 
+
+```{r dim-vector}
+dim(x = big_int_vec)
+```
+
+This is where the `matrix` comes in, R's basic two-dimensional data structure.
+
+## The `matrix`
+
+The `matrix` is native to R, so they require no additional packages to build and use. A matrix can contain rows and columns, but all of it's elements must be the same class (i.e., integer, double, character, logical). 
+
+```{r matrix, echo=FALSE, out.height='35%', out.width='35%', fig.align='right'}
+knitr::include_graphics(path = "www/matrix.png")
+```
+
+
+You can read more about their structure [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/matrix.html) or by typing `??matrix` into the console. 
+
+###
+
+We can create a matrix using the `matrix()` function (it's arguments are displayed below):
+
+```{r matrix-args, eval=FALSE, echo=TRUE}
+matrix(
+  data = ,
+  nrow = ,
+  ncol = ,
+  byrow = ,
+  dimnames =
+)
+```
+
+The `nrow` and `ncol` arguments tell matrix how many rows and columns to create. By default, matrices are filled by column. 
+
+###
+
+To demonstrate how this works, we'll start with a vector of numbers 1-6 (`int_vec`). 
+
+```{r show-int_vec}
+int_vec <- c(1:6)
+int_vec
+```
+
+###
+
+
+```{r prepare-int_vec, echo=TRUE, eval=TRUE}
+int_vec <- c(1:6)
+```
+
+Create a matrix in the code block below: 
+
+1. Pass `int_vec` to the  data argument  
+2. Create `int_mat`, a matrix with 2 rows by 3 columns 
+3. Print `int_mat`  
+
+```{r bycol-matrix, exercise=TRUE, exercise.setup="prepare-int_vec", exercise.lines=5}
+____ <- matrix(
+  data = ____,
+  nrow = ____,
+  ncol = ____)
+____
+```
+
+```{r bycol-matrix-solution}
+int_mat <- matrix(
+  data = int_vec, 
+  nrow = 2, 
+  ncol = 3)
+int_mat
+```
+
+```{r bycol-matrix-check}
+gradethis::grade_this_code()
+```
+
+### Matrix creation 
+
+Notice how the two objects are created. The vector contains all elements in an object six elements long:
+
+```{r int-vec-png, echo=FALSE, fig.align='center', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/int-vec.png")
+```
+
+###
+
+The matrix converts those six elements into a two-dimensional object (stacking the values by column). 
+
+```{r bycol-matrix-png, echo=FALSE, fig.align='center', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/bycol-matrix.png")
+```
+
+###
+
+We can use the `length()` and `dim()` functions to check the structure of each object. 
+
+In the code block below: 
+
+1. Check the length of `int_vec`  
+2. Check the dimensions of `int_mat`   
+
+```{r prepare-int_mat}
+int_vec <- c(1:6)
+int_mat <- matrix(data = int_vec, nrow = 2, ncol = 3)
+```
+
+```{r check_dim, exercise=TRUE, exercise.setup="prepare-int_mat"}
+# check vector length
+length(____)
+# check matrix dimensions
+dim(____)
+```
+
+```{r check_dim-solution}
+# check vector length
+length(int_vec)
+# check matrix dimensions
+dim(int_mat)
+```
+
+```{r check_dim-check}
+gradethis::grade_this_code()
+```
+
+### `byrow` 
+
+We can change the order of the values in the matrix with the `byrow` argument. If we change `byrow` to `TRUE`, we can see the values are filled across the rows (not down the columns). 
+
+###
+
+In the code block below, 
+
+1. Pass the `int_vec` to the data argument in `matrix()`  
+2. Create `int_brow_mat`, which is a matrix with 2 rows and 3 columns 
+3. Set `byrow` to `TRUE`   
+4. Print `int_brow_mat`  
+
+```{r byrow-matrix, exercise=TRUE, exercise.setup="prepare-int_vec", exercise.lines=7}
+____ <- matrix(
+  data = ____,
+  nrow = ____,
+  ncol = ____,
+  byrow = ____
+)
+____
+```
+
+```{r byrow-matrix-solution}
+int_brow_mat <- matrix(
+    data = int_vec,
+    nrow = 2,
+    ncol = 3,
+    byrow = TRUE
+  )
+int_brow_mat
+```
+
+```{r byrow-matrix-check}
+gradethis::grade_this_code()
+```
+
+###
+
+Notice how `matrix()` creates the object without the `byrow` set to `TRUE`:
+
+```{r byrow-matrix-png, echo=FALSE, fig.align='center', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/byrow-matrix.png")
+```
+
+###
+
+The `matrix` columns and rows are contained in the dimension (`dim`) attribute. See below:
+
+```{r prepare-attributes_matrix, eval=TRUE, echo=FALSE}
+int_vec <- c(1:6)
+int_mat <- matrix(data = int_vec, nrow = 2, ncol = 3)
+```
+
+```{r attributes_matrix}
+attributes(int_mat)
+```
+
+### Matrix subsetting
+
+If we're trying to access specific elements within a vector, we can use the brackets `[]` and a numerical index: 
+
+```{r brackets-demo}
+int_vec[3]
+```
+
+###
+
+With a matrix, we have to index elements using two positions: one for the row, the other for the column:
+
+```{r matrix-subsetting, echo=TRUE, eval=FALSE}
+matrix[row, column]
+```
+
+###
+
+The matrix actually displays these indexes when it's printed to the screen:  
+
+```{r print_matrix_subset, eval=FALSE, echo=TRUE}
+      [,1] [,2] [,3]
+ [1,]    1    3    5
+ [2,]    2    4    6
+```
+
+
+```{r prepare_matrix_subset, echo=TRUE}
+int_vec <- c(1:6)
+int_mat <- matrix(data = int_vec, nrow = 2, ncol = 3)
+int_mat
+```
+
+###
+
+In the code blocks below, complete the following subsetting operations: 
+
+1. Subset the elements at row position `1` and column position `2` 
+
+```{r matrix_subset_01, exercise=TRUE, exercise.setup="prepare_matrix_subset"}
+int_mat[ ____, ____]
+```
+
+```{r matrix_subset_01-solution}
+int_mat[ 1, 2]
+```
+
+```{r matrix_subset_01-check}
+gradethis::grade_this_code()
+```
+
+###
+
+2. Subset the elements in the second row.  
+
+```{r matrix_subset_02, exercise=TRUE, exercise.setup="prepare_matrix_subset"}
+int_mat[ ____, ]
+```
+
+```{r matrix_subset_02-solution}
+int_mat[ 2, ]
+```
+
+```{r matrix_subset_02-check}
+gradethis::grade_this_code()
+```
+
+###
+
+3. Subset the elements in the third column.  
+
+```{r matrix_subset_03, exercise=TRUE, exercise.setup="prepare_matrix_subset"}
+int_mat[ , ____]
+```
+
+```{r matrix_subset_03-solution}
+int_mat[ , 3]
+```
+
+```{r matrix_subset_03-check}
+gradethis::grade_this_code()
+```
+
+###
+
+4. Subset columns `2` and `3` only:
+
+```{r matrix_subset_04, exercise=TRUE, exercise.setup="prepare_matrix_subset"}
+int_mat[ , c(____, ____)]
+```
+
+```{r matrix_subset_04-solution}
+int_mat[ , c(2, 3)]
+```
+
+```{r matrix_subset_04-check}
+gradethis::grade_this_code()
+```
+
+### Matrix coercion
+
+A `matrix` can only hold values of the same type. If we try to combine values with different types, the `matrix` follows the same coercion rules that govern how vectors are created. 
+
+###
+
+In the code block below, 
+
+1. Create a `matrix` with the two vectors: `x_int` and `z_chr`   
+2. Give the matrix 3 rows and 2 columns    
+3. Check the type of with `typeof()`  
+
+```{r coercion-matrix, exercise=TRUE}
+# integer vector
+x_int <- c(5L, 1L, 3L)
+# character vector
+z_chr <- c("A", "B", "C")
+# matrix
+xz_mat <- matrix(
+  data = c(____, ____),
+  nrow = ____,
+  ncol = ____)
+typeof(____)
+```
+
+```{r coercion-matrix-solution}
+# integer vector
+x_int <- c(5L, 1L, 3L)
+# character vector
+z_chr <- c("A", "B", "C")
+# matrix
+xz_mat <- matrix(
+  data = c(x_int, z_chr),
+  nrow = 3,
+  ncol = 2)
+typeof(xz_mat)
+```
+
+```{r coercion-matrix-check}
+gradethis::grade_this_code()
+```
+
+###
+
+We can see that if we create a matrix with an integer vector (`x_var`) and character vector (`z_var`), the result are coerced into a character.
+
+### `colnames()` and `rownames()`
+
+After the matrix has been created, we can assign names using the `colnames()` and `rownames()` functions. 
+
+In the code block below, 
+
+1. Assign the `c_nms` vector to the columns in `int_mat` with `colnames()`
+2. Assign the `r_nms` vector to the rows in `int_mat` with `rownames()`  
+3. Print `int_mat` 
+
+```{r col_row_names, exercise=TRUE}
+int_mat <- matrix(
+  data = 1:6,
+  nrow = 3,
+  ncol = 2)
+# column names
+c_nms <- c("column 1", "column 2")
+# row names
+r_nms <- c("row 1", "row 2", "row 3")
+# assign column names 
+colnames(int_mat) <- ____
+# assign row names 
+rownames(int_mat) <- ____
+# print int_mat
+____
+```
+
+```{r col_row_names-solution}
+int_mat <- matrix(
+  data = 1:6,
+  nrow = 3,
+  ncol = 2)
+c_nms <- c("column 1", "column 2")
+r_nms <- c("row 1", "row 2", "row 3")
+colnames(int_mat) <- c_nms
+rownames(int_mat) <- r_nms
+int_mat
+```
+
+```{r col_row_names-check}
+gradethis::grade_this_code()
+```
+
+### `dimnames` 
+
+Matrices also have the ability to store dimension names (as `dimnames`). These are passed to the `matrix()` function using a `list()` (which we will cover next). 
+
+## The list
+
+Lists are not rectangular per se, but they're an important part of two-dimensional data objects in R. As we saw above, we can't assign `dimnames` to a matrix without using a `list()`--this is because a list can contain objects of different size (or `length()`). 
+
+###
+
+### What problems are solved with a `list()`?
+
+When we add `dimnames` to a `matrix`, the values are given in a `list()` as two character vectors. These vectors have to be the same lengths of the `nrow` and `ncol`.
+
+
+```{r test_matrix_dimnames}
+test_matrix <- matrix(
+  data = c(
+    c(1L, 2L, 3L, 10L, 11L, 12L)
+    ), 
+  nrow = 3, # three rows
+  ncol = 2, # two columns
+  dimnames = list(
+    c("r1", "r2", "r3"), # three row names
+    c("c1", "c2"))) # two column names
+```
+
+
+###
+
+```{r prepare_test_matrix_dimnames, echo=FALSE}
+test_matrix <- matrix(
+  data = c(
+    c(1L, 2L, 3L, 10L, 11L, 12L)
+    ), 
+  nrow = 3, # three rows
+  ncol = 2, # two columns
+  dimnames = list(
+    c("r1", "r2", "r3"), # three row names
+    c("c1", "c2"))) # two column names
+```
+
+Let's check the structure of the `test_matrix`:
+
+```{r str-test-matrix, exercise=TRUE, exercise.setup="prepare_test_matrix_dimnames"}
+str(test_matrix)
+```
+
+###
+
+We see the values we gave to the `data` argument:
+
+```{r, eval=FALSE}
+# int [1:3, 1:2] 1 2 3 10 11 12
+```
+
+`dimnames` are stored as an attribute:
+
+```{r, eval=FALSE}
+# - attr(*, "dimnames")`
+
+```
+
+The list of row and column names (as two `chr` vectors): 
+
+```{r, eval=FALSE} 
+#                     List of 2
+# ..$ : chr [1:3] "r1" "r2" "r3"
+# ..$ : chr [1:2] "c1" "c2"
+```
+
+### Practice making `list()`s
+
+Complete the code block below:
+
+1. The `list()` supplied to `dimnames` should have two vectors: 
+  - the first vector is the names for the rows (`c("row 1", "row 2", "row 3")`)  
+  - the second vector is the names for the columns (`c("column 1", "column 2")`)  
+
+```{r dimnames, exercise=TRUE, exercise.lines=10}
+matrix(
+  data = 1:6,
+  nrow = 3,
+  ncol = 2,
+  dimnames = list(
+    # place the row names on the line below, followed by a comma
+    ____
+    # place the column names on the line below 
+    ____
+))
+```
+
+```{r dimnames-solution}
+matrix(
+  data = 1:6,
+  nrow = 3,
+  ncol = 2,
+  dimnames = list(
+    # place the row names on the line below followed by a comma
+    c("row 1", "row 2", "row 3"),
+    # place the column names on the line below 
+    c("column 1", "column 2")
+))
+```
+
+```{r dimnames-check}
+gradethis::grade_this_code()
+```
+
+
+### Three things to know about lists
+
+In the example above, we created a `matrix` with `dimnames` using a `list()`. We'll explore lists more in another tutorial, but there are a few important features lists possess that we should address. 
+
+###
+
+First, lists can contain elements with different classes (or modes). 
+
+```{r list-01-png, echo=FALSE, out.height='30%', out.width='30%', fig.align='right'}
+knitr::include_graphics(path = "www/list-01.png")
+```
+
+###
+
+Create `small_list` in the code block below: 
+
+1. Place the vectors next to their appropriate name    
+2. Assign the output form list to `small_list`  
+3. Print `small_list` to the screen for review  
+
+```{r small_list, exercise=TRUE, exercise.lines=14}
+# logical vector 
+log_vector <- c(TRUE, FALSE, TRUE)
+# integer vector 
+int_vector <- seq(1:3)
+# character vector 
+chr_vector <- c("A", "B", "C") 
+# list
+____ <- list(
+  'logical' = ____,
+  'integer' = ____,
+  'character' =  ____
+  
+)
+____
+```
+
+```{r small_list-solution}
+# logical vector 
+log_vector <- c(TRUE, FALSE, TRUE)
+# integer vector 
+int_vector <- seq(1:3)
+# character vector 
+chr_vector <- c("A", "B", "C") 
+# list
+small_list <- list(
+  'logical' = log_vector,
+  'integer' = int_vector,
+  'character' =  chr_vector
+  
+)
+small_list
+```
+
+```{r small_list-check}
+gradethis::grade_this_code()
+```
+
+###
+
+Second, lists can contain elements of unequal lengths.
+
+```{r list-02a-png, echo=FALSE, out.height='50%', out.width='50%', fig.align='right'}
+knitr::include_graphics(path = "www/list-02a.png")
+```
+
+###
+
+Even unequal lengths of more complex vectors 
+
+```{r list-02b-png, echo=FALSE, out.height='65%', out.width='65%', fig.align='right'}
+knitr::include_graphics(path = "www/list-02b.png")
+```
+
+###
+
+In the code block below: 
+
+1. Place the vectors next to their correct names (`'small integer'` and `'big character'`)   
+2. Assign the output from `list()` to `unequal_list`  
+3. Print the `unequal_list` to the screen for review   
+
+```{r unequal_list, exercise=TRUE, exercise.lines=11}
+# small integer
+small_int_vec <- 1:3
+# big character 
+big_chr_vec <- c("d", "e", "f", "g", "h")
+# create list
+____ <- list(
+  '____' = small_int_vec,
+  '____' = big_chr_vec
+)
+# print
+____
+```
+
+```{r unequal_list-solution}
+# small integer
+small_int_vec <- 1:3
+# big character 
+big_chr_vec <- c("d", "e", "f", "g", "h")
+# create list
+unequal_list <- list(
+  'small integer' = small_int_vec,
+  'big character' = big_chr_vec
+)
+# print
+unequal_list
+```
+
+```{r unequal_list-check}
+gradethis::grade_this_code()
+```
+
+
+###
+
+Lastly, lists are recursive, so they can even store other lists!
+
+```{r list-03-png, echo=FALSE, out.height='75%', out.width='75%', fig.align='right'}
+knitr::include_graphics(path = "www/list-03.png")
+```
+
+###
+
+In the code block below, 
+
+1. Create `big_list` using `small_list` and `unequal_list`   
+2. Print `big_list` to the screen for review  
+
+```{r prepare-lists, echo=FALSE}
+log_vector <- c(TRUE, FALSE, TRUE)
+int_vector <- seq(1:3)
+chr_vector <- c("A", "B", "C") 
+small_list <- list(
+  'logical' = log_vector,
+  'integer' = int_vector,
+  'character' =  chr_vector
+  
+)
+small_int_vec <- 1:3
+big_chr_vec <- c("d", "e", "f", "g", "h")
+unequal_list <- list(
+  'small integer' = small_int_vec,
+  'big character' = big_chr_vec
+)
+```
+
+
+```{r big_list, exercise=TRUE, exercise.setup="prepare-lists", exercise.lines=5}
+____ <- list(
+  'small list' = ____,
+  'unequal list' = ____
+)
+____
+```
+
+```{r big_list-solution}
+big_list <- list(
+  'small list' = small_list,
+  'unequal list' = unequal_list
+)
+big_list
+```
+
+```{r big_list-check}
+gradethis::grade_this_code()
+```
+
+###
+
+Because of their flexible containment structure, lists are great for capturing and storing objects of just about any type or size (*this is an important feature we want to borrow to create a `data.frame`*)
+
+```{r the-list-png, echo=FALSE, fig.align='center', out.height='50%', out.width='50%'}
+knitr::include_graphics(path = "www/the-list.png")
+```
+
+### Flexible, but with constraints
+
+Let's recap what we know about matrices:  
+
+###
+
+#### 1. A matrix is made up of elements of the same class (or `mode`)
+
+```{r matrix-01-png, echo=FALSE, fig.align='right', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/matrix-01.png")
+```
+
+###
+
+
+#### 2. A matrix is a two-dimensional object  
+
+```{r matrix-02-png, echo=FALSE, fig.align='right', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/matrix-02.png")
+```
+
+###
+
+#### 3. A matrix can have named columns and rows (provided to the `dimnames` argument in a `list()`)  
+
+```{r matrix-03-png, echo=FALSE, fig.align='right', out.height='90%', out.width='90%'}
+knitr::include_graphics(path = "www/matrix-03.png")
+```
+
+###
+
+Let's recap what we know about lists:  
+
+#### 1. Lists can contain elements of different class (or `mode()`) and size (or `length()`)   
+
+The code below creates the following list:
+
+```{r code_list_str_01, echo=FALSE, fig.align='center', out.height='90%', out.width='90%'}
+knitr::include_graphics(path = "www/list-code-str-01.png")
+```
+
+```{r list_str_01, eval=TRUE, echo=FALSE}
+list_str_01 <- list(
+  int = c(1L, 2L, 3L, 4L),
+  chr = c("A", "B"), 
+  fct = factor(x = c("low", "med", "high"), 
+    levels = c("low", "med", "high"), 
+    ordered = TRUE), 
+  date = c(Sys.Date(), Sys.Date() + 1, Sys.Date() - 1)
+)
+list_str_01
+```
+
+
+
+You'll notice the elements of a list are indexed using `$` and the name (i.e., `$int`, `$chr`, `$fct`, etc.). Each element in the list is then referenced with a single bracket (`[1]`). 
+
+I've placed the indexes above the elements in the figure below for reference: 
+
+###
+
+```{r list-str-01-png, echo=FALSE, fig.align='right', out.height='70%', out.width='70%'}
+knitr::include_graphics(path = "www/list-str-01.png")
+```
+
+###
+
+#### 2. Lists can contain other lists (i.e. they're recursive) 
+
+The code below adds two lists (`lst_log` and `lst_dbl`) to the list we created above. 
+
+```{r list-code-str-02-png, echo=FALSE, fig.align='center', out.height='90%', out.width='90%'}
+knitr::include_graphics(path = "www/list-code-str-02.png")
+```
+
+```{r code_list_str_02, eval=TRUE, echo=FALSE}
+list_str_02 <- list(
+  int = c(1L, 2L, 3L, 4L),
+  chr = c("A", "B"), 
+  fct = factor(x = c("low", "med", "high"), 
+    levels = c("low", "med", "high"), 
+    ordered = TRUE), 
+  date = c(Sys.Date(), Sys.Date() + 1, Sys.Date() - 1),
+  lst_log = list(
+    log = TRUE
+  ),
+  lst_dbl = list(
+    dbl = c(1.5, 2.3)
+    )
+  )
+list_str_02
+```
+
+###
+
+When we combine lists with lists, we can see the structure of the list becomes much more complex. These are added as elements `$lst_log$log` and `$lst_dbl$dbl`:
+
+###
+
+```{r list-str-02-png, echo=FALSE, fig.align='right', out.height='85%', out.width='85%'}
+knitr::include_graphics(path = "www/list-str-02.png")
+```
+
+###
+
+Flexibility is one the strengths of lists--they are great for storing multiple objects (espcially if you have a mix of data types). However, the flexibility comes with a tradeoff. List structures can quickly become hard to reliably extract data from. 
+
+For example, let's view our list when we add another list that contains vectors of different types and lengths: 
+
+###
+
+```{r list-code-str-03-png, echo=FALSE, fig.align='center', out.height='90%', out.width='90%'}
+knitr::include_graphics(path = "www/list-code-str-03.png")
+```
+
+###
+
+Below is our updated list:
+
+```{r list_str_03, eval=TRUE, echo=FALSE}
+list_str_03 <- list(
+  int = c(1L, 2L, 3L, 4L),
+  chr = c("A", "B"), 
+  fct = factor(x = c("low", "med", "high"), 
+    levels = c("low", "med", "high"), 
+    ordered = TRUE), 
+  date = c(Sys.Date(), Sys.Date() + 1, Sys.Date() - 1),
+  lst_log = list(
+    log = TRUE
+  ),
+  lst_dbl = list(
+    dbl = c(1.5, 2.3)
+    ),
+  lst_comb = list(
+    int2 = c(1L, 2L, 3L),
+    date2 = c(Sys.time(), Sys.time() + 1),
+    chr2 = c("A", "B", "C")
+  )
+)
+list_str_03
+```
+
+###
+
+Below is our updated figure: 
+
+```{r list-str-03-png, echo=FALSE, fig.align='right', out.height='95%', out.width='95%'}
+knitr::include_graphics(path = "www/list-str-03.png")
+```
+
+As we can see--it would be hard to convert this list into a spreadsheet in it's current form. Spreadsheets typically contain values in a variety of formats (numbers, text, dates, etc.), but they have a consistent structure. 
+
+###
+
+An ideal rectangular data object would borrow two characteristics from a matrix: 
+
+1. **Have two dimensions**    
+2. **Nameable columns and rows**    
+
+We also want our rectangular data object to be able to **store multiple data formats** (which we can do with lists).
+
+## The `data.frame`
+
+The `data.frame` combines the flexible storage ability of a `list` *and* the row and column structure (dimensions) of a `matrix`. In `data.frame`s, vectors of different classes are stored in the columns, but these columns must all have equal lengths. 
+
+```{r data-frame, echo=FALSE, out.height='60%', out.width='60%', fig.align='right'}
+knitr::include_graphics(path = "www/data-frame.png")
+```
+
+###
+
+### Structure
+
+The `data.frame` is also native to R, and it's structure is similar to a matrix *and* a list. Like, matrices, `data.frame`s are organized in columns and rows, but unlike matrices, the `data.frame` can contain vectors of different types. 
+
+###
+
+The `data.frame` is considered a list, but ***a list which each element is a vector of the same length***. You can read more about their structure [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html) or by typing `??data.frame` into the console. 
+
+###
+
+As stated above, a `data.frame` is a list of vectors of equal length. The `data.frame()` function is most commonly used in one of two ways: 
+
+1. Create a `data.frame` by providing names and vector contents: 
+
+```{r df-name-c, eval=TRUE, echo=TRUE}
+data.frame(
+  x = c(1, 2, 3), 
+  y = c(TRUE, FALSE, FALSE),
+  z = c("A", "B", "C")
+)
+```
+
+2. Create vectors first, then assign new names in `data.frame()`
+
+```{r df-named-vectors, eval=TRUE, echo=TRUE}
+xvar <- c(1, 2, 3)
+yvar <- c(TRUE, FALSE, FALSE)
+zvar <- c("A", "B", "C")
+data.frame(
+  x = xvar, 
+  y = yvar, 
+  z = zvar
+)
+```
+
+### Create `data.frame`s 
+
+We're going to create a `data.frame` of [Wu-Tang Clan members](https://en.wikipedia.org/wiki/Wu-Tang_Clan). We've loaded the four vectors in the code block below: 
+
+- `wu_members`: member names   
+- `wu_name`: birth names   
+- `wu_born`: year born   
+- `wu_cities`: city from   
+
+Build `wu_df` by assigning the appropriate vector to the column in the `data.frame`
+
+```{r prepare-wu_data, echo=FALSE}
+wu_members <- c("RZA", "GZA", "ODB", "Method Man",
+                "Raekwon", "Ghostface Killah",
+                "Inspectah Deck", "U-God",
+                "Masta Killa", "Cappadonna")
+wu_name <- c("Robert Fitzgerald Diggs", "Gary Eldridge Gric",
+             "Russell Tyrone Jones", "Clifford Smith, Jr.",
+             "Corey Woods", "Dennis Coles",
+             "Jason Richard Hunter", "Lamont Jody Hawkins",
+             "Jamel Irief", "Darryl Hill")
+wu_born <- c(1969L, 1966L, 1968L, 1971L, 1970L,
+            1970L, 1970L, 1970L, 1969L, 1968L)
+wu_cities <- c("New York City",
+              "New York City",
+              "New York City",
+              "Hempstead, Long Island",
+              "New York City",
+              "Staten Island, New York City",
+              "New York City",
+              "New York City",
+              "New York City",
+              "New York City")
+```
+
+```{r wu_df, exercise=TRUE, exercise.setup="prepare-wu_data"}
+wu_df <- data.frame(
+  "member" = ____,
+  "name" = ____,
+  "born" = ____,
+  "city" = ____
+)
+# print wu_df to the screen below:
+____
+```
+
+```{r wu_df-solution}
+wu_df <- data.frame(
+  "member" = wu_members,
+  "name" = wu_name,
+  "born" = wu_born,
+  "city" = wu_cities
+)
+# print wu_df to the screen below:
+wu_df
+```
+
+```{r wu_df-check}
+gradethis::grade_this_code()
+```
+
+We can also build `data.frame`s using a combination of named vectors and created vectors. 
+
+###
+
+In the code block below, we've loaded two vectors (`wu_members` and `wu_name`): 
+
+1. Use the named vectors to create the member and name columns  
+2. Move the code for `born` and `city` into the correct column names  
+
+```{r prepare_wu_df_02}
+wu_members <- c("RZA", "GZA", "ODB", "Method Man",
+                "Raekwon", "Ghostface Killah",
+                "Inspectah Deck", "U-God",
+                "Masta Killa", "Cappadonna")
+wu_name <- c("Robert Fitzgerald Diggs", "Gary Eldridge Gric",
+             "Russell Tyrone Jones", "Clifford Smith, Jr.",
+             "Corey Woods", "Dennis Coles",
+             "Jason Richard Hunter", "Lamont Jody Hawkins",
+             "Jamel Irief", "Darryl Hill")
+```
+
+```{r wu_df_02, exercise=TRUE, exercise.setup="prepare_wu_df_02", exercise.lines=17}
+# born column
+c(1969L, 1966L, 1968L, 1971L, 1970L, 
+  1970L, 1970L, 1970L, 1969L, 1968L)
+# city column
+c("New York City", "New York City",
+  "New York City", "Hempstead, Long Island",
+  "New York City", "Staten Island, New York City", 
+  "New York City", "New York City",
+  "New York City", "New York City")
+wu_df <- data.frame(
+  "member" = ____,
+  "name" = ____,
+  "born" = ____,
+  "city" = ____
+)
+# print wu_df to the screen below:
+____
+```
+
+```{r wu_df_02-solution}
+wu_df <- data.frame(
+  "member" = wu_members,
+  "name" = wu_name,
+  "born" = c(1969L, 1966L, 1968L, 1971L, 1970L, 
+            1970L, 1970L, 1970L, 1969L, 1968L),
+  "city" = c("New York City", "New York City",
+  "New York City", "Hempstead, Long Island",
+  "New York City", "Staten Island, New York City", 
+  "New York City", "New York City",
+  "New York City", "New York City")
+)
+# print wu_df to the screen below:
+wu_df
+```
+
+```{r wu_df_02-check}
+gradethis::grade_this_code()
+```
+
+### Columns and rows
+
+As we've stated above, `data.frame`s in R are similar to spreadsheets. The data are organized in columns and rows. 
+
+In the code block below: 
+
+1. Place `wu_df` inside the `colnames()` function   
+2. Place `wu_df` inside the `rownames()` function   
+
+```{r prepare_wu_df_colnames, include=FALSE}
+wu_df <- data.frame(
+            member = c("RZA","GZA","ODB",
+                       "Method Man","Raekwon","Ghostface Killah","Inspectah Deck",
+                       "U-God","Masta Killa","Cappadonna"),
+              name = c("Robert Fitzgerald Diggs",
+                       "Gary Eldridge Gric","Russell Tyrone Jones",
+                       "Clifford Smith, Jr.","Corey Woods","Dennis Coles",
+                       "Jason Richard Hunter","Lamont Jody Hawkins","Jamel Irief","Darryl Hill"),
+              born = c(1969L,1966L,1968L,1971L,
+                       1970L,1970L,1970L,1970L,1969L,1968L),
+              city = c("New York City",
+                       "New York City","New York City","Hempstead, Long Island",
+                       "New York City","Staten Island, New York City","New York City",
+                       "New York City","New York City","New York City"))
+```
+
+```{r wu_df_colnames, exercise=TRUE, exercise.setup = "prepare_wu_df_colnames"}
+colnames(____)
+rownames(____)
+```
+
+```{r wu_df_colnames-solution}
+colnames(wu_df)
+rownames(wu_df)
+```
+
+```{r wu_df_colnames-check}
+gradethis::grade_this_code()
+```
+
+We can see `colnames()` prints the four column names (or vectors). The `rownames()` function returns a character vector of numbers (one for each row in `wu_df`). 
+
+###
+
+In the code block below: 
+
+1. Check the structure of `wu_df` using `str()`
+
+```{r prepare_wu_df_str, include=FALSE}
+wu_df <- data.frame(
+            member = c("RZA","GZA","ODB",
+                       "Method Man","Raekwon","Ghostface Killah","Inspectah Deck",
+                       "U-God","Masta Killa","Cappadonna"),
+              name = c("Robert Fitzgerald Diggs",
+                       "Gary Eldridge Gric","Russell Tyrone Jones",
+                       "Clifford Smith, Jr.","Corey Woods","Dennis Coles",
+                       "Jason Richard Hunter","Lamont Jody Hawkins","Jamel Irief","Darryl Hill"),
+              born = c(1969L,1966L,1968L,1971L,
+                       1970L,1970L,1970L,1970L,1969L,1968L),
+              city = c("New York City",
+                       "New York City","New York City","Hempstead, Long Island",
+                       "New York City","Staten Island, New York City","New York City",
+                       "New York City","New York City","New York City"))
+```
+
+```{r str_wu_df, exercise=TRUE, exercise.setup = "prepare_wu_df_str"}
+# put the wu_df inside the str() function
+str(____)
+```
+
+```{r str_wu_df-solution}
+# put the wu_df inside the str() function
+str(wu_df)
+```
+
+```{r str_wu_df-check}
+gradethis::grade_this_code()
+```
+
+
+###
+
+`str()` tells us the class/mode of `wu_df` (`'data.frame'`), and the dimensions (`10 obs. of  4 variables:`). We can also see the class or type of each column (`chr` or `int`).
+
+### Recap
+
+We've learned `data.frame`s are the logical extension from matrices, because they retain the rectangular structure (with rows and columns), but can contain multiple classes/types of vectors (unlike matrices). 
+
+## The `tibble`
+
+The `tibble` comes from the [`tibble` package](https://github.com/tidyverse/tibble/), which is part of the [`tidyverse`](https://www.tidyverse.org). `tibble`s are a "*modern re-imagining of the `data.frame`, keeping what time has proven to be effective, and throwing out what is not.*"
+
+```{r tibble, echo=FALSE, out.height='60%', out.width='60%', fig.align='right'}
+knitr::include_graphics(path = "www/tibble.png")
+```
+
+A `tibble` is similar to a `data.frame`, but has two additional classes (`tbl` and `tbl_df`). You can read more about `tibble`s on the [website](https://tibble.tidyverse.org) or in the [R for Data Science text.](https://r4ds.hadley.nz/tibble.html)  
+
+We can create `tibble`s using one of two functions: `tibble()` or `tribble()`
+
+###
+
+### Creating tibbles with `tibble()`
+
+The `tibble()` function works a lot like the `data.frame()` function.
+
+```{r tibble-args, eval=FALSE}
+tibble(
+  ...,
+  .rows = NULL,
+  .name_repair = c("check_unique", "unique", "universal", "minimal")
+)
+```
+
+We can pass named vectors or values directly to the column names. 
+
+###
+
+In the code block below we've loaded the following vectors:
+
+- `wu_members`: member names   
+- `wu_name`: birth names   
+- `wu_born`: year born   
+- `wu_alive`: still alive? 
+
+1. Create `wu_tbl`--a `tibble` with the vectors above (using the appropriate column name provided) 
+2. Print `wu_tbl` to the screen 
+
+```{r prepare_tbl_wu_data, echo=FALSE}
+wu_members <- c("RZA", "GZA", "ODB", "Method Man",
+                "Raekwon", "Ghostface Killah",
+                "Inspectah Deck", "U-God",
+                "Masta Killa", "Cappadonna")
+wu_name <- c("Robert Fitzgerald Diggs", "Gary Eldridge Gric",
+             "Russell Tyrone Jones", "Clifford Smith, Jr.",
+             "Corey Woods", "Dennis Coles",
+             "Jason Richard Hunter", "Lamont Jody Hawkins",
+             "Jamel Irief", "Darryl Hill")
+wu_born <- c(1969L, 1966L, 1968L, 1971L, 1970L, 
+            1970L, 1970L, 1970L, 1969L, 1968L)
+wu_alive <- c(TRUE, TRUE, FALSE, TRUE, TRUE, 
+            TRUE, TRUE, TRUE, TRUE, TRUE)
+```
+
+```{r wu_tbl, exercise=TRUE, exercise.setup="prepare_tbl_wu_data", exercise.lines=9}
+tibble(
+  members = ____,
+  name = ____, 
+  born = ____, 
+  alive = ____
+)
+# print tibble 
+____
+```
+
+```{r wu_tbl-solution}
+wu_tbl <- tibble(
+  members = wu_members,
+  name = wu_name, 
+  born = wu_born, 
+  alive = wu_alive
+)
+# print tibble 
+wu_tbl
+```
+
+```{r wu_tbl-check}
+gradethis::grade_this_code()
+```
+
+### Creating tibbles with `tribble()`
+
+The `tribble()` function will create a row-wise tibble. This means we can enter our data left-to-right (the same way we might in a spreadsheet). We define column names with a preceding `~`, and place values directly under their respective name. 
+
+```{r tribble-args, eval=FALSE}
+tribble(
+  ~chr_col, ~int_col,
+       "a",        1,
+       "b",        2,
+       "c",        3
+)
+```
+
+We're going to see how this works using our Wu-Tang Clan data. 
+
+###
+
+In the code block below: 
+
+1. Create `wu_tbl` again, but this time use `trbble` and give the tibble the following names: `members`, `name`, `born`, `alive` (assigning the correct column names, preceded by the `~`). 
+2. Print the `wu_tbl` to the screen 
+
+```{r wu_tribble, exercise=TRUE, exercise.lines=17}
+# give the tibble names
+wu_tbl <- tibble::tribble(
+               ~____,                     ~____, ~____, ~____,
+               "RZA", "Robert Fitzgerald Diggs", 1969L,   TRUE,
+               "GZA",      "Gary Eldridge Gric", 1966L,   TRUE,
+               "ODB",    "Russell Tyrone Jones", 1968L,  FALSE,
+        "Method Man",     "Clifford Smith, Jr.", 1971L,   TRUE,
+           "Raekwon",             "Corey Woods", 1970L,   TRUE,
+  "Ghostface Killah",            "Dennis Coles", 1970L,   TRUE,
+    "Inspectah Deck",    "Jason Richard Hunter", 1970L,   TRUE,
+             "U-God",     "Lamont Jody Hawkins", 1970L,   TRUE,
+       "Masta Killa",             "Jamel Irief", 1969L,   TRUE,
+        "Cappadonna",             "Darryl Hill", 1968L,   TRUE
+  )
+# print wu_tbl
+____
+```
+
+```{r wu_tribble-solution}
+# give the tibble names
+wu_tbl <- tibble::tribble(
+            ~members,                     ~name, ~born, ~alive,
+               "RZA", "Robert Fitzgerald Diggs", 1969L,   TRUE,
+               "GZA",      "Gary Eldridge Gric", 1966L,   TRUE,
+               "ODB",    "Russell Tyrone Jones", 1968L,  FALSE,
+        "Method Man",     "Clifford Smith, Jr.", 1971L,   TRUE,
+           "Raekwon",             "Corey Woods", 1970L,   TRUE,
+  "Ghostface Killah",            "Dennis Coles", 1970L,   TRUE,
+    "Inspectah Deck",    "Jason Richard Hunter", 1970L,   TRUE,
+             "U-God",     "Lamont Jody Hawkins", 1970L,   TRUE,
+       "Masta Killa",             "Jamel Irief", 1969L,   TRUE,
+        "Cappadonna",             "Darryl Hill", 1968L,   TRUE
+  )
+# print wu_tbl
+wu_tbl
+```
+
+
+```{r wu_tribble-check}
+gradethis::grade_this_code()
+```
+
+
+### `tibble` structure
+
+```{r prepare_wu_tbl_str, echo=FALSE}
+wu_tbl <- tibble::tribble(
+            ~members,                     ~name, ~born, ~alive,
+               "RZA", "Robert Fitzgerald Diggs", 1969L,   TRUE,
+               "GZA",      "Gary Eldridge Gric", 1966L,   TRUE,
+               "ODB",    "Russell Tyrone Jones", 1968L,  FALSE,
+        "Method Man",     "Clifford Smith, Jr.", 1971L,   TRUE,
+           "Raekwon",             "Corey Woods", 1970L,   TRUE,
+  "Ghostface Killah",            "Dennis Coles", 1970L,   TRUE,
+    "Inspectah Deck",    "Jason Richard Hunter", 1970L,   TRUE,
+             "U-God",     "Lamont Jody Hawkins", 1970L,   TRUE,
+       "Masta Killa",             "Jamel Irief", 1969L,   TRUE,
+        "Cappadonna",             "Darryl Hill", 1968L,   TRUE
+  )
+```
+
+
+Place `wu_tbl` inside the `str()` function and click on the **Run Code** button below to view it's structure:
+
+```{r str_wu_tbl, exercise=TRUE, exercise.setup = "prepare_wu_tbl_str"}
+# put the tibble inside the str() function
+str()
+```
+
+```{r str_wu_tbl-solution}
+str(wu_tbl)
+```
+
+```{r str_wu_tbl-check}
+gradethis::grade_this_code()
+```
+
+The output from `str(wu_tbl)` prints the number of rows x columns (`[5 × 4]`) and the *class* (`S3: tbl_df/tbl/data.frame`), and a preview of it's contents. 
+
+### Printing `tibble`s
+
+`tibble`s print to the screen a little nicer to the screen. Print `wu_tbl` in the code chunk below: 
+
+```{r prepare-wu_tbl-print, include=FALSE}
+wu_tbl <- tibble::tribble(
+            ~members,                     ~name, ~born, ~alive,
+               "RZA", "Robert Fitzgerald Diggs", 1969L,   TRUE,
+               "GZA",      "Gary Eldridge Gric", 1966L,   TRUE,
+               "ODB",    "Russell Tyrone Jones", 1968L,  FALSE,
+        "Method Man",     "Clifford Smith, Jr.", 1971L,   TRUE,
+           "Raekwon",             "Corey Woods", 1970L,   TRUE,
+  "Ghostface Killah",            "Dennis Coles", 1970L,   TRUE,
+    "Inspectah Deck",    "Jason Richard Hunter", 1970L,   TRUE,
+             "U-God",     "Lamont Jody Hawkins", 1970L,   TRUE,
+       "Masta Killa",             "Jamel Irief", 1969L,   TRUE,
+        "Cappadonna",             "Darryl Hill", 1968L,   TRUE
+  )
+```
+
+```{r wu_tbl-print, exercise=TRUE, exercise.setup = "prepare-wu_tbl-print"}
+# print wu_tbl
+
+```
+
+We can see the format of each column is also printed with the output (`<chr>`, `<int>`, `<lgl>`). Compare this to `wu_df` in the code chunk below:
+
+```{r prepare_wu_df_print, include=FALSE}
+wu_df <- data.frame(
+            member = c("RZA","GZA","ODB",
+                       "Method Man","Raekwon","Ghostface Killah","Inspectah Deck",
+                       "U-God","Masta Killa","Cappadonna"),
+              name = c("Robert Fitzgerald Diggs",
+                       "Gary Eldridge Gric","Russell Tyrone Jones",
+                       "Clifford Smith, Jr.","Corey Woods","Dennis Coles",
+                       "Jason Richard Hunter","Lamont Jody Hawkins","Jamel Irief","Darryl Hill"),
+              born = c(1969L,1966L,1968L,1971L,
+                       1970L,1970L,1970L,1970L,1969L,1968L),
+              alive = c(TRUE, TRUE, FALSE, TRUE, TRUE, 
+                      TRUE, TRUE, TRUE, TRUE, TRUE))
+```
+
+```{r wu_df_print, exercise=TRUE, exercise.setup = "prepare_wu_df_print"}
+# print wu_df
+
+```
+
+We can see the `data.frame` prints the contents, but no additional information about the dimensions or column class/type. 
+
+## The `data.table`  
+
+`data.table` objects from from the[ `data.table` package](https://rdatatable.gitlab.io/data.table/), and these are "*a high-performance version of base R’s `data.frame`.*" 
+
+```{r data-table, echo=FALSE, out.height='60%', out.width='60%', fig.align='right'}
+knitr::include_graphics(path = "www/data-table.png")
+```
+
+### Structure
+
+The `data.table` is also similar to the `data.frame` (it has two classes, `data.table` and `data.frame`). The syntax for using `data.table`s can be challenging at first, but they're known for being more memory efficient, and performing  manipulation operations are generally faster than `tibble`s or `data.frame`s.
+
+###
+
+Technically speaking, *a `data.table` is a `data.frame`* (but an *enhanced* `data.frame`). Enhanced how? All of the enhancements are listed on the [package website](https://rdatatable.gitlab.io/data.table/), but we'll include a few here:
+
+- concise syntax: fast to type, fast to read
+- fast speed
+- memory efficient
+
+###
+
+Most people turn to `data.table` when they're dealing with large datasets or performing operations with multiple tables (joining, row-subsetting, grouping, etc.). Users with a background in SQL will find `data.table`s syntax familiar. 
+
+```r
+DT[i, j, by]
+
+##   R:                 i                 j        by
+## SQL:  where | order by   select | update  group by
+```
+
+### Creating `data.table`s  
+
+To create a `data.table`, you can use the same methods you used above to create a `data.frame`. 
+
+```{r prepare_wu_dt, echo=FALSE}
+wu_members <- c("RZA", "GZA", "ODB", "Method Man",
+                "Raekwon", "Ghostface Killah",
+                "Inspectah Deck", "U-God",
+                "Masta Killa", "Cappadonna")
+wu_name <- c("Robert Fitzgerald Diggs", "Gary Eldridge Gric",
+             "Russell Tyrone Jones", "Clifford Smith, Jr.",
+             "Corey Woods", "Dennis Coles",
+             "Jason Richard Hunter", "Lamont Jody Hawkins",
+             "Jamel Irief", "Darryl Hill")
+wu_born <- c(1969L, 1966L, 1968L, 1971L, 1970L,
+            1970L, 1970L, 1970L, 1969L, 1968L)
+wu_alive <- c(TRUE, TRUE, FALSE, TRUE, TRUE, 
+                      TRUE, TRUE, TRUE, TRUE, TRUE)
+```
+
+In the code block below: 
+
+1. Create `wu_dt` using data.table and the following vectors (which have been loaded for you): 
+
+- `wu_members`: member names   
+- `wu_name`: birth names   
+- `wu_born`: year born   
+- `wu_alive`: still alive?
+
+2. Print `wu_dt` to the screen
+
+
+```{r create_wu_dt, exercise=TRUE, exercise.setup="prepare_wu_dt"}
+wu_dt <- data.table(
+  member = ____,
+  name = ____,
+  born = ____,
+  alive = ____
+)
+# print wu_dt
+
+```
+
+
+```{r create_wu_dt-solution}
+wu_dt <- data.table(
+  member = wu_members,
+  name = wu_name,
+  born = wu_born,
+  alive = wu_alive
+)
+# print wu_dt
+wu_dt
+```
+
+```{r create_wu_dt-check}
+gradethis::grade_this_code()
+```
+
+### 
+
+As we can see, the output from printing the `data.table` is identical to the output form `data.frame`
+
+### `data.table` structure 
+
+Place `wu_dt` inside the `str()` function and click on the **Run Code** button below to view it's structure:
+
+```{r prepare_wu_dt_str, echo=FALSE}
+wu_dt <- data.table::data.table(
+      member = c("RZA","GZA","ODB","Method Man",
+                 "Raekwon","Ghostface Killah","Inspectah Deck","U-God","Masta Killa",
+                 "Cappadonna"),
+        name = c("Robert Fitzgerald Diggs",
+                 "Gary Eldridge Gric","Russell Tyrone Jones","Clifford Smith, Jr.",
+                 "Corey Woods","Dennis Coles","Jason Richard Hunter",
+                 "Lamont Jody Hawkins","Jamel Irief","Darryl Hill"),
+        born = c(1969L,1966L,1968L,1971L,1970L,1970L,
+                 1970L,1970L,1969L,1968L),
+       alive = c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
+)
+```
+
+
+```{r wu_dt_str, exercise=TRUE, exercise.setup="prepare_wu_dt_str"}
+# view the structure of the data.table
+str(____)
+```
+
+```{r wu_dt_str-solution}
+# view the structure of the data.table
+str(wu_dt)
+```
+
+```{r wu_dt_str-check}
+gradethis::grade_this_code()
+```
+
+We can see the output from `str(wu_dt)` tells us this is indeed a `data.table` *and* a `data.frame`. It also prints the dimensions in the same method as the `data.frame` (`10 obs. of  4 variables`). 
+
+## Comparisons
+
+We've loaded `wu_df`, `wu_tbl`, and `wu_dt` in the code blocks below:
+
+```{r prepare_all_reactangles, echo=FALSE}
+wu_df <- data.frame(
+  member = c(
+    "RZA", "GZA", "ODB",
+    "Method Man", "Raekwon", 
+    "Ghostface Killah", "Inspectah Deck",
+    "U-God", "Masta Killa", "Cappadonna"
+  ),
+  name = c(
+    "Robert Fitzgerald Diggs",
+    "Gary Eldridge Gric", "Russell Tyrone Jones",
+    "Clifford Smith, Jr.", "Corey Woods", "Dennis Coles",
+    "Jason Richard Hunter", "Lamont Jody Hawkins", 
+    "Jamel Irief", "Darryl Hill"
+  ),
+  born = c(
+    1969L, 1966L, 1968L, 1971L,
+    1970L, 1970L, 1970L, 1970L, 1969L, 1968L
+  ),
+  alive = c(
+    TRUE, TRUE, FALSE, TRUE, TRUE,
+    TRUE, TRUE, TRUE, TRUE, TRUE
+  )
+)
+
+wu_tbl <- tibble::tribble(
+  ~members, ~name, ~born, ~alive,
+  "RZA", "Robert Fitzgerald Diggs", 1969L, TRUE,
+  "GZA", "Gary Eldridge Gric", 1966L, TRUE,
+  "ODB", "Russell Tyrone Jones", 1968L, FALSE,
+  "Method Man", "Clifford Smith, Jr.", 1971L, TRUE,
+  "Raekwon", "Corey Woods", 1970L, TRUE,
+  "Ghostface Killah", "Dennis Coles", 1970L, TRUE,
+  "Inspectah Deck", "Jason Richard Hunter", 1970L, TRUE,
+  "U-God", "Lamont Jody Hawkins", 1970L, TRUE,
+  "Masta Killa", "Jamel Irief", 1969L, TRUE,
+  "Cappadonna", "Darryl Hill", 1968L, TRUE
+)
+wu_dt <- data.table::data.table(
+  member = c(
+    "RZA", "GZA", "ODB", "Method Man",
+    "Raekwon", "Ghostface Killah", 
+    "Inspectah Deck", "U-God", "Masta Killa",
+    "Cappadonna"
+  ),
+  name = c(
+    "Robert Fitzgerald Diggs",
+    "Gary Eldridge Gric", "Russell Tyrone Jones", 
+    "Clifford Smith, Jr.", "Corey Woods", "Dennis Coles",
+    "Jason Richard Hunter", "Lamont Jody Hawkins",
+    "Jamel Irief", "Darryl Hill"
+  ),
+  born = c(
+    1969L, 1966L, 1968L, 1971L, 1970L, 1970L,
+    1970L, 1970L, 1969L, 1968L
+  ),
+  alive = c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
+)
+```
+
+### Check `class()`
+
+```{r all_class, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# check the class of wu_df
+class(____)
+# check the class of wu_tbl
+class(____)
+# check the class of wu_dt
+class(____)
+```
+
+```{r all_class-solution}
+# check the class of wu_df
+class(wu_df)
+# check the class of wu_tbl
+class(wu_tbl)
+# check the class of wu_dt
+class(wu_dt)
+```
+
+```{r all_class-check}
+gradethis::grade_this_code()
+```
+
+### Check `typeof()`
+
+In the previous solution, we learned `tibble`s and `data.table`s have multiple classes. Now let's check their `typeof()`
+
+```{r all_typeof, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# check the type of wu_df
+typeof(____)
+# check the type of wu_tbl
+typeof(____)
+# check the type of wu_dt
+typeof(____)
+```
+
+```{r all_typeof-solution}
+# check the type of wu_df
+typeof(wu_df)
+# check the type of wu_tbl
+typeof(wu_tbl)
+# check the type of wu_dt
+typeof(wu_dt)
+```
+
+```{r all_typeof-check}
+gradethis::grade_this_code()
+```
+
+Are you surprised to find out all of these are lists? That's because they all have the underlying structure (i.e., *a list of vectors of equal length*). 
+
+Let's check their attributes. 
+
+### Check `attributes()`
+
+```{r wu_df_attributes, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# check the attributes of wu_df
+attributes(____)
+```
+
+```{r wu_df_attributes-solution}
+# check the attributes of wu_df
+attributes(wu_df)
+```
+
+```{r wu_df_attributes-check}
+gradethis::grade_this_code()
+```
+
+```{r wu_tbl_attributes, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# check the attributes of wu_tbl
+attributes(____)
+```
+
+```{r wu_tbl_attributes-solution}
+# check the attributes of wu_tbl
+attributes(wu_tbl)
+```
+
+```{r wu_tbl_attributes-check}
+gradethis::grade_this_code()
+```
+
+###
+
+We can see the attributes for `data.frame`s and `tibble`s are nearly identical. How about the `data.table`?
+
+```{r wu_dt_attributes, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# check the attributes of wu_dt
+attributes(____)
+```
+
+```{r wu_dt_attributes-solution}
+# check the attributes of wu_dt
+attributes(wu_dt)
+```
+
+```{r wu_dt_attributes-check}
+gradethis::grade_this_code()
+```
+
+###
+
+What is the `$.internal.selfref`?
+
+The `.internal.selfref` is an attribute that keeps `data.table`s from copying over itself (read a complete explanation [here](https://stackoverflow.com/questions/20687235/warning-invalid-internal-selfref-detected-when-adding-a-column-to-a-data-tab), 
+
+> "*It's simply an attribute attached to DT that contains the address in RAM of DT. If R inadvertently copies DT, the address of DT will move in RAM but the attribute attached will still contain the old memory address, they won't match any more. data.table checks they do match (i.e. is valid) before adding a new column by reference into a spare column pointer slot.*"
+
+### Conversions 
+
+Each of these objects can be converted into the other.
+
+### `data.frame` -> `data.table`
+
+1. Convert `wu_df` to a `data.table` with `as.data.table()` and store in `wu_df2dt`
+2. View the structure of `wu_df2dt`
+
+```{r wu_df2dt, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# convert wu_df to data.table
+wu_df2dt <- as.data.table(____)
+str(____)
+```
+
+```{r wu_df2dt-solution}
+# convert wu_df to data.table
+wu_df2dt <- as.data.table(wu_df)
+str(wu_df2dt)
+```
+
+```{r wu_df2dt-check}
+gradethis::grade_this_code()
+```
+
+### `tibble` -> `data.table`
+
+1. Convert `wu_tbl` to a `data.table` with `as.data.table()` and store in `wu_tbl2dt`
+2. View the structure of `wu_tbl2dt`
+
+```{r wu_tbl2dt, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# convert wu_df to data.table
+wu_tbl2dt <- as.data.table(____)
+str(____)
+```
+
+```{r wu_tbl2dt-solution}
+# convert wu_df to data.table
+wu_tbl2dt <- as.data.table(wu_tbl)
+str(wu_tbl2dt)
+```
+
+```{r wu_tbl2dt-check}
+gradethis::grade_this_code()
+```
+
+### `data.table` -> `tibble`
+
+1. Convert `wu_dt` to a `tibble` with `as.tibble()` and store in `wu_dt2tbl`
+2. View the structure of `wu_dt2tbl`
+
+```{r wu_dt2tbl, exercise=TRUE, exercise.setup="prepare_all_reactangles"}
+# convert wu_df to tibble
+wu_dt2tbl <- as.tibble(____)
+str(____)
+```
+
+```{r wu_dt2tbl-solution}
+# convert wu_df to tibble
+wu_dt2tbl <- as.tibble(wu_dt)
+str(wu_dt2tbl)
+```
+
+```{r wu_dt2tbl-check}
+gradethis::grade_this_code()
+```
+
+
+## Recap
+
+In this tutorial we learned about R's four rectangular data objects: 
+
+1. the `matrix`: created with `matrix()`, `nrow`, `ncol`, `byrow` (optional), and `dimnames` (optional). Matrices are like vectors in the sense that they must contain vectors of the same class or type. A list of names can be used to set the column and row names (or with `rownames()` and `colnames()`). 
+
+2. The `data.frame`: created with `data.frame()` using either named vectors or values (with `c()`). `data.frame`s can contain vectors of different class/type (like lists), but all vectors *must* be the same length.
+
+3. The `tibble`: created with either `tibble()` or `tribble()`, a tibble is an improved extension of the `data.frame`, with more a descriptive printing display. Primarily used in the `tidyverse`. 
+
+4. The `data.table`: created with `data.table()`, these are *enhanced* `data.frame`s with an additional attribute (`.internal.selfref`) and better performance (faster and more memory efficient than `data.frame`s).
+
+
+
+

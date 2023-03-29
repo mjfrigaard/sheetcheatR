@@ -1,0 +1,17 @@
+{
+    "dialog-state": {
+        "query": "sheetcheatR",
+        "path": "",
+        "regex": false,
+        "caseSensitive": false,
+        "wholeWord": false,
+        "filePatterns": [],
+        "useGitGrep": true,
+        "excludeGitIgnore": false,
+        "excludeFilePatterns": [],
+        "resultsCount": 281,
+        "errorCount": 0,
+        "replaceErrors": "",
+        "projectRelative": true
+    }
+}

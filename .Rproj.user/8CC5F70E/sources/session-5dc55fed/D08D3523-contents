@@ -1,0 +1,95 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Welcome to `sheetcheatR`
+
+![](https://img.shields.io/badge/lifecycle-developing-red)
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+The goal of `sheetcheatR` is to provide R exercises modeled after RStudio's excellent cheatsheets. Check them out [here](https://www.rstudio.com/resources/cheatsheets/).
+
+## Installation
+
+You can install the development version of `sheetcheatR` like so:
+
+``` r
+install.packages("remotes")
+remotes::install_github("mjfrigaard/sheetcheatR")
+```
+
+## Example
+
+This is a basic example:
+
+```{r example, eval=FALSE}
+library(sheetcheatR)
+library(learnr)
+## basic example code
+learnr::run_tutorial("import", package = "sheetcheatR")
+```
+
+# Get started
+
+If you're new to R, I recommend starting with the following tutorials:
+
++-----------------------+--------------------------------------------------+-------------------------------------------------------------------+
+| **Name**              | **Description**                                  | **Run with...**                                                   |
++-----------------------+--------------------------------------------------+-------------------------------------------------------------------+
+| Atomic Vectors        | *introduction to R's foundational data object*   | `learnr::run_tutorial("atomic-vectors", package = "sheetcheatR")` |
++-----------------------+--------------------------------------------------+-------------------------------------------------------------------+
+| S3 Vectors            | *factors, dates, datetimes, and difftimes*       | `learnr::run_tutorial("S3-vectors", package = "sheetcheatR")`     |
++-----------------------+--------------------------------------------------+-------------------------------------------------------------------+
+| Rectangular data in R | *matrices, data.frames, tibbles, and data.tabes* | `learnr::run_tutorial("rectangles", package = "sheetcheatR")`     |
++-----------------------+--------------------------------------------------+-------------------------------------------------------------------+
+
+## Cheatsheet Tutorials
+
+Below are the completed tutorials in the package.
+
++-------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------+
+| **Name**                                                    | **Description**                                                                                                                                                                       | **Run with...**                                           |
++=============================================================+=======================================================================================================================================================================================+===========================================================+
+| **Data import with `readr`, `readxl`, and `googlesheets4`** | *These exercises cover importing data with the **`readr`, `readxl`,** and **`googlesheets4`** packages.*                                                                              | ```                                                       |
+|                                                             |                                                                                                                                                                                       | learnr::run_tutorial("import", package = "sheetcheatR")   |
+|                                                             |                                                                                                                                                                                       | ```                                                       |
++-------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------+
+| **Data visualization with `ggplot2` cheatsheet (part 1)**   | *These exercises cover the basics of `ggplot2`, aesthetics, graph primitives, and single variable graphs.*                                                                            | ```                                                       |
+|                                                             |                                                                                                                                                                                       | learnr::run_tutorial("ggp2-p1", package = "sheetcheatR")  |
+|                                                             |                                                                                                                                                                                       | ```                                                       |
++-------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------+
+| **Tidying your data with `tidyr` (part 1)**                 | *These exercises cover an overview of `tibbles` and reshaping tidy data using the `pivot_` functions, splitting and combining columns, and dealing with missing and incomplete data.* | ```                                                       |
+|                                                             |                                                                                                                                                                                       | learnr::run_tutorial("tidyr-p1", package = "sheetcheatR") |
+|                                                             |                                                                                                                                                                                       | ```                                                       |
++-------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------+
+| **Data Transformation with `dplyr` (part 1)**               | These exercises cover pipes (`|>` and `%>%`), counting, grouping/un-grouping, summarizing, and row-wise operations.                                                                   | ```                                                       |
+|                                                             |                                                                                                                                                                                       | learnr::run_tutorial("dplyr-p1", package = "sheetcheatR") |
+|                                                             |                                                                                                                                                                                       | ```                                                       |
++-------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------+
+
+## Extra tutorials
+
+*These tutorials aren't covered in a specific cheat sheet. They either borrow from multiple sheets or cover/expand on more foundational topics.*
+
++--------------+---------------------------+---------------------------------------------------------------+
+| Name         | Description               | Run with...                                                   |
++==============+===========================+===============================================================+
+| Command line | basic command line skills | ```                                                           |
+|              |                           | learnr::run_tutorial("command-line", package = "sheetcheatR") |
+|              |                           | ```                                                           |
++--------------+---------------------------+---------------------------------------------------------------+

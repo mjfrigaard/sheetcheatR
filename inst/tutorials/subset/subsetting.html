@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<meta name="progressive" content="true" />
+<meta name="allow-skip" content="true" />
+<meta name="learnr-version-prerender" content="0.10.7.9000" />
+
+<title>Subsetting data in R</title>
+
+<!-- header-includes START -->
+<!-- HEAD_CONTENT -->
+<!-- header-includes END -->
+<!-- HEAD_CONTENT -->
+
+<!-- highlightjs -->
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+<!-- taken from https://github.com/rstudio/rmarkdown/blob/de8a9c38618903627ca509f5401d50a0876079f7/inst/rmd/h/default.html#L293-L343 -->
+<!-- tabsets -->
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+<!-- end tabsets -->
+
+
+</head>
+
+<body>
+<a class='sr-only sr-only-focusable visually-hidden-focusable' href='#learnr-tutorial-content'>Skip to Tutorial Content</a>
+
+
+
+<div class="pageContent band">
+<main class="bandContent page">
+
+<article class="topics" id="learnr-tutorial-content">
+
+<div id="section-overview" class="section level2">
+<h2>Overview</h2>
+<p>When we want to extract or replace an element from an existing object
+in R, the term for this action is <a
+href="https://adv-r.hadley.nz/subsetting.html">subsetting.</a>. There
+isn’t a cheatsheet dedicated to subsetting, but there probably should be
+:)</p>
+<p>Subsetting can be challenging if you’re new to R. These exercises are
+not an exhaustive list of all subsetting cases, but should hopefully
+provide you with enough knowledge to get you pointed in the right
+direction.</p>
+<p>We’re going to cover following topics:</p>
+<ol style="list-style-type: decimal">
+<li>The index brackets (<code>[</code> &amp; <code>[[</code>) and the
+dollar sign (<code>$</code>)<br />
+</li>
+<li>Extraction
+<ul>
+<li>Extracting multiple elements</li>
+<li>Extracting a single element</li>
+</ul></li>
+<li>Replacement
+<ul>
+<li>Replacing multiple elements</li>
+<li>Replacing a single element</li>
+</ul></li>
+<li>Removal
+<ul>
+<li>Removing multiple elements</li>
+<li>Removing a single element</li>
+</ul></li>
+</ol>
+<div id="section-section" class="section level3">
+<h3></h3>
+</div>
+<div id="section-enter-the-wu" class="section level3">
+<h3>Enter the Wu</h3>
+<p>These exercises use data from the <a
+href="https://en.wikipedia.org/wiki/Wu-Tang_Clan">Wu-Tang Clan</a>, an
+American hip-hop group. <br><br></p>
+<div class="figure" style="text-align: center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/8/80/Wu_Tang_Clan_on_Stage.jpg" alt="source: https://en.wikipedia.org/wiki/Wu-Tang_Clan" width="90%" height="90%" />
+<p class="caption">
+source: <a href="https://en.wikipedia.org/wiki/Wu-Tang_Clan"
+class="uri">https://en.wikipedia.org/wiki/Wu-Tang_Clan</a>
+</p>
+</div>
+</div>
+<div id="section-elements-names-and-values" class="section level3">
+<h3>Elements, names, and values</h3>
+<p>We’re going to start with a vector of <a
+href="https://en.wikipedia.org/wiki/Wu-Tang_Clan">Wu-Tang Clan</a>
+members. View it’s contents below:</p>
+<div class="sourceCode" id="section-cb1"><pre
+class="sourceCode r"><code class="sourceCode r"><span id="section-cb1-1"><a href="#section-cb1-1" aria-hidden="true" tabindex="-1"></a>wu_members</span>
+<span id="section-cb1-2"><a href="#section-cb1-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Robert Fitzgerald Diggs      Gary Eldridge Gric </span></span>
+<span id="section-cb1-3"><a href="#section-cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">##                   &quot;RZA&quot;                   &quot;GZA&quot; </span></span>
+<span id="section-cb1-4"><a href="#section-cb1-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    Russell Tyrone Jones     Clifford Smith, Jr. </span></span>
+<span id="section-cb1-5"><a href="#section-cb1-5" aria-hidden="true" tabindex="-1"></a><span class="do">##                   &quot;ODB&quot;            &quot;Method Man&quot; </span></span>
+<span id="section-cb1-6"><a href="#section-cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">##             Corey Woods            Dennis Coles </span></span>
+<span id="section-cb1-7"><a href="#section-cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">##               &quot;Raekwon&quot;      &quot;Ghostface Killah&quot; </span></span>
+<span id="section-cb1-8"><a href="#section-cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">##    Jason Richard Hunter     Lamont Jody Hawkins </span></span>
+<span id="section-cb1-9"><a href="#section-cb1-9" aria-hidden="true" tabindex="-1"></a><span class="do">##        &quot;Inspectah Deck&quot;                 &quot;U-God&quot; </span></span>
+<span id="section-cb1-10"><a href="#section-cb1-10" aria-hidden="true" tabindex="-1"></a><span class="do">##             Jamel Irief             Darryl Hill </span></span>
+<span id="section-cb1-11"><a href="#section-cb1-11" aria-hidden="true" tabindex="-1"></a><span class="do">##           &quot;Masta Killa&quot;            &quot;Cappadonna&quot;</span></span></code></pre></div>
+</div>
+<div id="section-section-1" class="section level3">
+<h3></h3>
+<p>We’re going to clear up some jargon before we move ahead. The
+<code>wu_members</code> vector has ten <strong>elements</strong>, and
+each element has <strong>value</strong> and <strong>name</strong>
+attribute. For example, if check the attributes of
+<code>wu_members</code>, we see the following:</p>
+<div class="sourceCode" id="section-cb2"><pre
+class="sourceCode r"><code class="sourceCode r"><span id="section-cb2-1"><a href="#section-cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check attributes</span></span>
+<span id="section-cb2-2"><a href="#section-cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(wu_members)</span>
+<span id="section-cb2-3"><a href="#section-cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">## $names</span></span>
+<span id="section-cb2-4"><a href="#section-cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] &quot;Robert Fitzgerald Diggs&quot; &quot;Gary Eldridge Gric&quot;      &quot;Russell Tyrone Jones&quot;   </span></span>
+<span id="section-cb2-5"><a href="#section-cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [4] &quot;Clifford Smith, Jr.&quot;     &quot;Corey Woods&quot;             &quot;Dennis Coles&quot;           </span></span>
+<span id="section-cb2-6"><a href="#section-cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [7] &quot;Jason Richard Hunter&quot;    &quot;Lamont Jody Hawkins&quot;     &quot;Jamel Irief&quot;            </span></span>
+<span id="section-cb2-7"><a href="#section-cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [10] &quot;Darryl Hill&quot;  </span></span></code></pre></div>
+</div>
+<div id="section-section-2" class="section level3">
+<h3></h3>
+<p>We can see the <code>$names</code> attribute is a set of character
+values (one for each value in <code>wu_members</code>). If we
+deconstruct <code>wu_members</code> with <code>dput()</code>, we can see
+these are created in <code>`name` = "value"</code> pairs.</p>
+<div class="sourceCode" id="section-cb3"><pre
+class="sourceCode r"><code class="sourceCode r"><span id="section-cb3-1"><a href="#section-cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># deconstruct </span></span>
+<span id="section-cb3-2"><a href="#section-cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dput</span>(wu_members)</span>
+<span id="section-cb3-3"><a href="#section-cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  c(`Robert Fitzgerald Diggs` = &quot;RZA&quot;,</span></span>
+<span id="section-cb3-4"><a href="#section-cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Gary Eldridge Gric` = &quot;GZA&quot;,</span></span>
+<span id="section-cb3-5"><a href="#section-cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Russell Tyrone Jones` = &quot;ODB&quot;,</span></span>
+<span id="section-cb3-6"><a href="#section-cb3-6" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Andre Romelle Young` = &quot;Method Man&quot;,</span></span>
+<span id="section-cb3-7"><a href="#section-cb3-7" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Corey Woods` = &quot;Raekwon&quot;,</span></span>
+<span id="section-cb3-8"><a href="#section-cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Dennis Coles` = &quot;Ghostface Killah&quot;,</span></span>
+<span id="section-cb3-9"><a href="#section-cb3-9" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Jason Richard Hunter` = &quot;Inspectah Deck&quot;,</span></span>
+<span id="section-cb3-10"><a href="#section-cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Lamont Jody Hawkins` = &quot;U-God&quot;,</span></span>
+<span id="section-cb3-11"><a href="#section-cb3-11" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Jamel Irief` = &quot;Masta Killa&quot;,</span></span>
+<span id="section-cb3-12"><a href="#section-cb3-12" aria-hidden="true" tabindex="-1"></a><span class="do">##    `Darryl Hill` = &quot;Cappadonna&quot;)</span></span></code></pre></div>
+</div>
+<div id="section-section-3" class="section level3">
+<h3></h3>
+<p><code>$names</code> are important when we’re subsetting because
+they’re an attribute we can use them to locate elements in an object,
+but they are not the element values.</p>
+</div>
+<div id="section-section-4" class="section level3">
+<h3></h3>
+<p>The figure below displays how to think about elements, names, and
+values for the first two elements in <code>wu_members</code>:</p>
+<p><img src="www/element-name-value.png" width="80%" height="80%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="section-and" class="section level2">
+<h2><code>[</code> , <code>[[</code> and <code>$</code></h2>
+<p>The index brackets come in two flavors: single brackets
+<code>[x]</code> or double brackets <code>[[x]]</code>. <strong>The
+<code>[</code> operator will extract or replace multiple elements, and
+the <code>[[</code> operator will extract or replace a single
+element.</strong></p>
+<div id="section-section-5" class="section level3">
+<h3></h3>
+<p>How each set of brackets works depend on:</p>
+<ol style="list-style-type: decimal">
+<li>their placement with respect the assignment operator
+(<code>&lt;-</code>),<br />
+</li>
+<li>the object they’re being used with (vectors, matrices, data.frames,
+lists, etc.), and<br />
+</li>
+<li>the value provided (<code>x</code>).</li>
+</ol>
+</div>
+<div id="section-section-6" class="section level3">
+<h3></h3>
+<p>Hidden away in the help documentation (<code>?`[[`</code>) is a very
+important point about the three subsetting operators:</p>
+<blockquote>
+<p><em>The most important distinction between <code>[</code>,
+<code>[[</code> and <code>$</code> is that the <code>[</code> can select
+more than one element whereas the other two select a single
+element.</em></p>
+</blockquote>
+</div>
+<div id="section-section-7" class="section level3">
+<h3></h3>
+<p>As stated above, <code>$</code> and <code>[[</code> are similar.
+However, <code>$</code> only works on recursive objects, like
+<code>lists</code> and <code>data.frame</code>s.</p>
+</div>
+</div>
+<div id="section-extraction-replacement-and-removal"
+class="section level2">
+<h2>Extraction, Replacement, and Removal</h2>
+<p><strong>Extraction</strong> is used when we want a reduced portion
+(i.e. <em>subset</em>) of an object, or if we want to convert an object
+into a less complex structure (i.e. from a <code>data.frame</code> or
+<code>list</code> to a <code>vector</code>).</p>
+<p><strong>Replacement</strong> is</p>
+<p><strong>Removal</strong> is</p>
+</div>
+<div id="section-extracting-multiple-elements" class="section level2">
+<h2>Extracting multiple elements</h2>
+<p>The following exercises will demonstrate various methods of
+extracting multiple elements from objects in R. We’ve also included the
+code to reproduce the objects in your own R session.</p>
+<div id="section-extracting-multiple-elements-vectors"
+class="section level3">
+<h3>Extracting multiple elements (vectors)</h3>
+<p>Let’s revisit our named list of <code>wu_members</code>.</p>
+<div class="sourceCode" id="section-cb4"><pre
+class="sourceCode r"><code class="sourceCode r"><span id="section-cb4-1"><a href="#section-cb4-1" aria-hidden="true" tabindex="-1"></a>wu_members <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Robert Fitzgerald Diggs</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;RZA&quot;</span>,</span>
+<span id="section-cb4-2"><a href="#section-cb4-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Gary Eldridge Gric</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;GZA&quot;</span>,</span>
+<span id="section-cb4-3"><a href="#section-cb4-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Russell Tyrone Jones</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;ODB&quot;</span>,</span>
+<span id="section-cb4-4"><a href="#section-cb4-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Clifford Smith, Jr.</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Method Man&quot;</span>,</span>
+<span id="section-cb4-5"><a href="#section-cb4-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Corey Woods</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Raekwon&quot;</span>,</span>
+<span id="section-cb4-6"><a href="#section-cb4-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Dennis Coles</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Ghostface Killah&quot;</span>,</span>
+<span id="section-cb4-7"><a href="#section-cb4-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Jason Richard Hunter</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Inspectah Deck&quot;</span>,</span>
+<span id="section-cb4-8"><a href="#section-cb4-8" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Lamont Jody Hawkins</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;U-God&quot;</span>,</span>
+<span id="section-cb4-9"><a href="#section-cb4-9" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Jamel Irief</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Masta Killa&quot;</span>,</span>
+<span id="section-cb4-10"><a href="#section-cb4-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">`</span><span class="at">Darryl Hill</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Cappadonna&quot;</span>)</span></code></pre></div>
+</div>
+<div id="section-section-8" class="section level3">
+<h3></h3>
+<p>View <code>wu_members</code> in the code chunk by clicking on the
+<strong>Run Code</strong> button:</p>
+<div class="tutorial-exercise" data-label="vectors_sb_wu_members"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="2">
+<pre class="text"><code>wu_members</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"subsetting"}</script>
+</div>
+</div>
+<div id="section-section-9" class="section level3">
+<h3></h3>
+<p>If we want to extract an element from a vector with single brackets,
+we can use numerical indexes or names (in quotes).</p>
+</div>
+<div id="section-section-10" class="section level3">
+<h3></h3>
+<p>In the code block below,</p>
+<ol style="list-style-type: decimal">
+<li>Extract the 4th and 7th elements in <code>wu_members</code> by
+placing single index brackets on the right-side of the assignment
+operator<br />
+</li>
+<li>Assign the extracted elements to <code>method_man_1b</code> and
+<code>inspectah_deck_1b</code><br />
+</li>
+<li>Print <code>method_man_1b</code> and <code>inspectah_deck_1b</code>
+to the screen on the following lines.</li>
+</ol>
+<div class="tutorial-exercise" data-label="extract_single_bracket"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="4">
+<pre class="text"><code>____ &lt;- wu_members[____] # extract method_man_1b
+____ &lt;- wu_members[____] # extract inspectah_deck_1b
+____
+____</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"subsetting"}</script>
+</div>
+<div class="tutorial-exercise-support"
+data-label="extract_single_bracket-solution" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>method_man_1b &lt;- wu_members[4] # extract method_man_1b
+inspectah_deck_1b &lt;- wu_members[7] # extract inspectah_deck_1b
+method_man_1b
+inspectah_deck_1b</code></pre>
+</div>
+</div>
+<div id="section-section-11" class="section level3">
+<h3></h3>
+<p>As we mentioned above, the <code>$names</code> attribute can be used
+to subset the values <code>wu_members</code> (just like their numerical
+positions).</p>
+<p>In the code block below,</p>
+<ol style="list-style-type: decimal">
+<li><p>Extract the elements with the <code>"Clifford Smith, Jr."</code>
+and <code>"Jason Richard Hunter"</code> names in
+<code>wu_members</code>, using single index brackets on the right-side
+of the assignment operator</p></li>
+<li><p>Assign the extracted elements to <code>method_man_1bn</code> (for
+‘1 bracket, named’) and <code>inspectah_deck_1bn</code></p></li>
+<li><p>Compare <code>method_man_1b</code> to <code>method_man_1bn</code>
+and <code>inspectah_deck_1bn</code> to <code>inspectah_deck_1bn</code>
+with the two <code>identical()</code> functions on the following
+lines</p></li>
+</ol>
+<div class="tutorial-exercise" data-label="extract_single_bracket_name"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="6">
+<pre class="text"><code>____ &lt;- wu_members[____] # extract method_man_1bn
+____ &lt;- wu_members[____] # extract inspectah_deck_1bn
+# compare method man using identical 
+identical(x = ____, y = ____)
+# compare Inspectah Deck using identical
+identical(x = ____, y = ____)</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"subsetting"}</script>
+</div>
+<div class="tutorial-exercise-support"
+data-label="extract_single_bracket_name-solution" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>method_man_1bn &lt;- wu_members[&quot;Clifford Smith, Jr.&quot;]
+inspectah_deck_1bn &lt;- wu_members[&quot;Jason Richard Hunter&quot;] 
+# compare method man using identical 
+identical(x = method_man_1b, y = method_man_1bn)
+# compare Inspectah Deck using identical
+identical(x = inspectah_deck_1b, y = inspectah_deck_1bn)</code></pre>
+</div>
+</div>
+<div id="section-extracting-multiple-elements-matrices-and-arrays"
+class="section level3">
+<h3>Extracting multiple elements (matrices and arrays)</h3>
+<p>Below we have a matrix of <a
+href="https://en.wikipedia.org/wiki/Wu-Tang_Clan#Studio_albums">Wu-Tang
+Clan</a> studio albums.</p>
+<div class="sourceCode" id="section-cb10"><pre
+class="sourceCode r"><code class="sourceCode r"><span id="section-cb10-1"><a href="#section-cb10-1" aria-hidden="true" tabindex="-1"></a>album <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Enter the Wu-Tang (36 Chambers)&quot;</span>,</span>
+<span id="section-cb10-2"><a href="#section-cb10-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Wu-Tang Forever&quot;</span>, <span class="st">&quot;The W&quot;</span>,</span>
+<span id="section-cb10-3"><a href="#section-cb10-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Iron Flag&quot;</span>, <span class="st">&quot;8 Diagrams&quot;</span>,</span>
+<span id="section-cb10-4"><a href="#section-cb10-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;A Better Tomorrow&quot;</span>,</span>
+<span id="section-cb10-5"><a href="#section-cb10-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Once Upon a Time in Shaolin&quot;</span>)</span>
+<span id="section-cb10-6"><a href="#section-cb10-6" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="fu">c</span>(1993L, 1997L, 2000L, 2001L, 2007L, 2014L, 2015L)</span>
+<span id="section-cb10-7"><a href="#section-cb10-7" aria-hidden="true" tabindex="-1"></a>wu_studio_albums <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="section-cb10-8"><a href="#section-cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">c</span>(album, year),</span>
+<span id="section-cb10-9"><a href="#section-cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol =</span> <span class="dv">2</span>,</span>
+<span id="section-cb10-10"><a href="#section-cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>), <span class="fu">c</span>(<span class="st">&quot;album&quot;</span>, <span class="st">&quot;year&quot;</span>))</span>
+<span id="section-cb10-11"><a href="#section-cb10-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>View it in the code chunk by clicking on the <strong>Run
+Code</strong> button:</p>
+<div class="tutorial-exercise" data-label="wu_studio_albums"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
+<pre class="text"><code>wu_studio_albums</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"subsetting"}</script>
+</div>
+</div>
+<div id="section-extracting-multiple-elements-lists"
+class="section level3">
+<h3>Extracting multiple elements (lists)</h3>
+</div>
+<div id="section-extracting-multiple-elements-data-frames"
+class="section level3">
+<h3>Extracting multiple elements (data frames)</h3>
+</div>
+</div>
+<div id="section-extracting-a-single-element" class="section level2">
+<h2>Extracting a single element</h2>
+<div id="section-extracting-a-single-element-vectors"
+class="section level3">
+<h3>Extracting a single element (vectors)</h3>
+</div>
+<div id="section-extracting-a-single-element-matrices-and-arrays"
+class="section level3">
+<h3>Extracting a single element (matrices and arrays)</h3>
+</div>
+<div id="section-extracting-a-single-element-lists"
+class="section level3">
+<h3>Extracting a single element (lists)</h3>
+</div>
+<div id="section-extracting-a-single-element-data-frames"
+class="section level3">
+<h3>Extracting a single element (data frames)</h3>
+</div>
+</div>
+<div id="section-replacement" class="section level2">
+<h2>Replacement</h2>
+<div id="section-replacing-multiple-elements" class="section level3">
+<h3>Replacing multiple elements</h3>
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul>
+</div>
+<div id="section-replacing-a-single-element" class="section level3">
+<h3>Replacing a single element</h3>
+<ul>
+<li>vectors</li>
+</ul>
+</div>
+<div id="section-section-12" class="section level3">
+<h3></h3>
+<p>Die-hard fans will notice two errors in <code>wu_members</code>:</p>
+<ol style="list-style-type: decimal">
+<li><code>Andre Romelle Young</code> isn’t <code>"Method Man"</code>’s
+real name–it’s <a
+href="https://en.wikipedia.org/wiki/Method_Man"><strong><code>Clifford Smith, Jr.</code></strong></a></li>
+</ol>
+<!-- ![](https://upload.wikimedia.org/wikipedia/commons/a/a5/Method_Man_at_Shattuck_Down_Low.jpg){ width=40% height=40%} -->
+<div class="figure" style="text-align: center">
+<img src="www/method_man.jpg" alt="https://en.wikipedia.org/wiki/Method_Man" width="20%" height="20%" />
+<p class="caption">
+<a href="https://en.wikipedia.org/wiki/Method_Man"
+class="uri">https://en.wikipedia.org/wiki/Method_Man</a>
+</p>
+</div>
+<ol start="2" style="list-style-type: decimal">
+<li><code>Jason Richard Hunter</code>’s stage name is spelled
+incorrectly: it’s currently spelled, <code>"Inspector deck"</code>, but
+it should be, <a
+href="https://en.wikipedia.org/wiki/Inspectah_Deck"><strong><code>"Inspectah Deck"</code></strong>.</a></li>
+</ol>
+<!-- ![](https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Inspectah_Deck_in_Paris%2C_2013.jpg/2560px-Inspectah_Deck_in_Paris%2C_2013.jpg){ width=50% height=50%} -->
+<div class="figure" style="text-align: center">
+<img src="www/inspectah_deck.jpg" alt="https://en.wikipedia.org/wiki/Inspectah_Deck" width="30%" height="30%" />
+<p class="caption">
+<a href="https://en.wikipedia.org/wiki/Inspectah_Deck"
+class="uri">https://en.wikipedia.org/wiki/Inspectah_Deck</a>
+</p>
+</div>
+<ul>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul>
+</div>
+</div>
+<div id="section-removal" class="section level2">
+<h2>Removal</h2>
+<div id="section-removing-multiple-elements" class="section level3">
+<h3>Removing multiple elements</h3>
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul>
+</div>
+<div id="section-removing-a-single-element" class="section level3">
+<h3>Removing a single element</h3>
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul>
+</div>
+</div>
+<div id="section-recap" class="section level2">
+<h2>Recap</h2>
+<p>In this tutorial we’ve covered:</p>
+<ol style="list-style-type: decimal">
+<li>The index brackets: <code>[</code> and <code>[[</code><br />
+</li>
+<li>Using the dollar sign (<code>$</code>)<br />
+</li>
+<li>Extraction
+<ul>
+<li>Extracting multiple elements
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul></li>
+<li>Extracting a single element
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul></li>
+</ul></li>
+<li>Replacement
+<ul>
+<li>Replacing multiple elements
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul></li>
+<li>Replacing a single element
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul></li>
+</ul></li>
+<li>Removal
+<ul>
+<li>Removing multiple elements
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames</li>
+</ul></li>
+<li>Removing a single element
+<ul>
+<li>vectors<br />
+</li>
+<li>matrices and arrays<br />
+</li>
+<li>lists<br />
+</li>
+<li>data frames 
+<script type="application/shiny-prerendered" data-context="server-start">
+library(learnr)
+library(rmdformats)
+library(tidyr)
+library(janitor)
+library(stringr)
+library(forcats)
+library(skimr)
+library(knitr)
+library(gradethis)
+library(data.table)
+library(sheetcheatR)
+library(reactable)
+library(dplyr)
+library(listviewer)
+knitr::opts_chunk$set(
+  error = TRUE,
+  upload.fun = imgur_upload,
+  fig.path = "www/",
+  collapse = TRUE,
+  exercise.cap = "subsetting",
+  warning = FALSE,
+  message = FALSE,
+  dpi = 96,
+  tibble.max_extra_cols = 6,
+  tibble.width = 65
+)
+options(scipen = 999999999, width = 60)
+strOptions(
+  strict.width = "yes",
+  digits.d = 1,
+  vec.len = 2,
+  list.len = 65,
+  deparse.lines = NULL
+)
+gradethis_setup(exercise.reveal_solution = TRUE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::register_http_handlers(session, metadata = NULL)
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::prepare_tutorial_state(session)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::i18n_observe_tutorial_language(input, session)
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+session$onSessionEnded(function() {
+        learnr:::event_trigger(session, "session_stop")
+      })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-vectors_sb_wu_members-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-vectors_sb_wu_members-code-editor`)), session)
+output$`tutorial-exercise-vectors_sb_wu_members-output` <- renderUI({
+  `tutorial-exercise-vectors_sb_wu_members-result`()
+})
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "vectors_sb_wu_members", global_setup = structure(c("library(learnr)", 
+"library(rmdformats)", "library(tidyr)", "library(janitor)", 
+"library(stringr)", "library(forcats)", "library(skimr)", "library(knitr)", 
+"library(gradethis)", "library(data.table)", "library(sheetcheatR)", 
+"library(reactable)", "library(dplyr)", "library(listviewer)", 
+"knitr::opts_chunk$set(", "  error = TRUE,", "  upload.fun = imgur_upload,", 
+"  fig.path = \"www/\",", "  collapse = TRUE,", "  exercise.cap = \"subsetting\",", 
+"  warning = FALSE,", "  message = FALSE,", "  dpi = 96,", "  tibble.max_extra_cols = 6,", 
+"  tibble.width = 65", ")", "options(scipen = 999999999, width = 60)", 
+"strOptions(", "  strict.width = \"yes\",", "  digits.d = 1,", 
+"  vec.len = 2,", "  list.len = 65,", "  deparse.lines = NULL", 
+")", "gradethis_setup(exercise.reveal_solution = TRUE)"), chunk_opts = list(
+    label = "setup", include = FALSE)), setup = "# correct!\nwu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")", 
+    chunks = list(list(label = "prepare_wu_members", code = "# correct!\nwu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")", 
+        opts = list(label = "\"prepare_wu_members\"", echo = "FALSE"), 
+        engine = "r"), list(label = "vectors_sb_wu_members", 
+        code = "wu_members", opts = list(label = "\"vectors_sb_wu_members\"", 
+            exercise = "TRUE", exercise.lines = "2", exercise.setup = "\"prepare_wu_members\""), 
+        engine = "r")), code_check = NULL, error_check = NULL, 
+    check = NULL, solution = NULL, tests = NULL, options = list(
+        eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
+        tidy.opts = NULL, collapse = TRUE, prompt = FALSE, comment = NA, 
+        highlight = FALSE, size = "normalsize", background = "#F7F7F7", 
+        strip.white = FALSE, cache = 0, cache.path = "subsetting_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "www/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 6.5, fig.height = 4, fig.env = "figure", 
+        fig.cap = NULL, fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 624, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = FALSE, error = TRUE, 
+        message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        max.print = 1000, exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        upload.fun = function (file, key = "9f3460e67f308f6") 
+        {
+            if (!is.character(key)) 
+                stop("The Imgur API Key must be a character string!")
+            resp = httr::POST("https://api.imgur.com/3/image.xml", 
+                config = httr::add_headers(Authorization = paste("Client-ID", 
+                  key)), body = list(image = httr::upload_file(file)))
+            httr::stop_for_status(resp, "upload to imgur")
+            res = httr::content(resp, as = "raw")
+            res = if (length(res)) 
+                xml2::as_list(xml2::read_xml(res))
+            if (packageVersion("xml2") >= "1.2.0") 
+                res <- res[[1L]]
+            if (is.null(res$link[[1]])) 
+                stop("failed to upload ", file)
+            structure(res$link[[1]], XML = res)
+        }, exercise.cap = "subsetting", tibble.max_extra_cols = 6, 
+        tibble.width = 65, exercise.reveal_solution = TRUE, label = "vectors_sb_wu_members", 
+        exercise = TRUE, exercise.lines = 2, exercise.setup = "prepare_wu_members", 
+        code = "wu_members", out.width.px = 624, out.height.px = 384, 
+        params.src = "vectors_sb_wu_members, exercise=TRUE,  exercise.lines=2, exercise.setup=\"prepare_wu_members\"", 
+        fig.num = 0, exercise.df_print = "default"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-extract_single_bracket-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-extract_single_bracket-code-editor`)), session)
+output$`tutorial-exercise-extract_single_bracket-output` <- renderUI({
+  `tutorial-exercise-extract_single_bracket-result`()
+})
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "extract_single_bracket", global_setup = structure(c("library(learnr)", 
+"library(rmdformats)", "library(tidyr)", "library(janitor)", 
+"library(stringr)", "library(forcats)", "library(skimr)", "library(knitr)", 
+"library(gradethis)", "library(data.table)", "library(sheetcheatR)", 
+"library(reactable)", "library(dplyr)", "library(listviewer)", 
+"knitr::opts_chunk$set(", "  error = TRUE,", "  upload.fun = imgur_upload,", 
+"  fig.path = \"www/\",", "  collapse = TRUE,", "  exercise.cap = \"subsetting\",", 
+"  warning = FALSE,", "  message = FALSE,", "  dpi = 96,", "  tibble.max_extra_cols = 6,", 
+"  tibble.width = 65", ")", "options(scipen = 999999999, width = 60)", 
+"strOptions(", "  strict.width = \"yes\",", "  digits.d = 1,", 
+"  vec.len = 2,", "  list.len = 65,", "  deparse.lines = NULL", 
+")", "gradethis_setup(exercise.reveal_solution = TRUE)"), chunk_opts = list(
+    label = "setup", include = FALSE)), setup = "# correct!\nwu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")", 
+    chunks = list(list(label = "prepare_wu_members", code = "# correct!\nwu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")", 
+        opts = list(label = "\"prepare_wu_members\"", echo = "FALSE"), 
+        engine = "r"), list(label = "extract_single_bracket", 
+        code = "____ <- wu_members[____] # extract method_man_1b\n____ <- wu_members[____] # extract inspectah_deck_1b\n____\n____", 
+        opts = list(label = "\"extract_single_bracket\"", exercise = "TRUE", 
+            exercise.lines = "4", exercise.setup = "\"prepare_wu_members\""), 
+        engine = "r")), code_check = NULL, error_check = NULL, 
+    check = structure("gradethis::grade_code()", chunk_opts = list(
+        label = "extract_single_bracket-check")), solution = structure(c("method_man_1b <- wu_members[4] # extract method_man_1b", 
+    "inspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b", 
+    "method_man_1b", "inspectah_deck_1b"), chunk_opts = list(
+        label = "extract_single_bracket-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = TRUE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = FALSE, cache = 0, 
+        cache.path = "subsetting_cache/html/", cache.vars = NULL, 
+        cache.lazy = TRUE, dependson = NULL, autodep = FALSE, 
+        cache.rebuild = FALSE, fig.keep = "high", fig.show = "asis", 
+        fig.align = "default", fig.path = "www/", dev = "png", 
+        dev.args = NULL, dpi = 192, fig.ext = "png", fig.width = 6.5, 
+        fig.height = 4, fig.env = "figure", fig.cap = NULL, fig.scap = NULL, 
+        fig.lp = "fig:", fig.subcap = NULL, fig.pos = "", out.width = 624, 
+        out.height = NULL, out.extra = NULL, fig.retina = 2, 
+        external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
+        warning = FALSE, error = TRUE, message = FALSE, render = NULL, 
+        ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
+        include = TRUE, purl = TRUE, max.print = 1000, exercise.timelimit = 60, 
+        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        upload.fun = function (file, key = "9f3460e67f308f6") 
+        {
+            if (!is.character(key)) 
+                stop("The Imgur API Key must be a character string!")
+            resp = httr::POST("https://api.imgur.com/3/image.xml", 
+                config = httr::add_headers(Authorization = paste("Client-ID", 
+                  key)), body = list(image = httr::upload_file(file)))
+            httr::stop_for_status(resp, "upload to imgur")
+            res = httr::content(resp, as = "raw")
+            res = if (length(res)) 
+                xml2::as_list(xml2::read_xml(res))
+            if (packageVersion("xml2") >= "1.2.0") 
+                res <- res[[1L]]
+            if (is.null(res$link[[1]])) 
+                stop("failed to upload ", file)
+            structure(res$link[[1]], XML = res)
+        }, exercise.cap = "subsetting", tibble.max_extra_cols = 6, 
+        tibble.width = 65, exercise.reveal_solution = TRUE, label = "extract_single_bracket", 
+        exercise = TRUE, exercise.lines = 4, exercise.setup = "prepare_wu_members", 
+        code = c("____ <- wu_members[____] # extract method_man_1b", 
+        "____ <- wu_members[____] # extract inspectah_deck_1b", 
+        "____", "____"), out.width.px = 624, out.height.px = 384, 
+        params.src = "extract_single_bracket, exercise=TRUE,  exercise.lines=4, exercise.setup=\"prepare_wu_members\"", 
+        fig.num = 0, exercise.df_print = "default"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-extract_single_bracket_name-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-extract_single_bracket_name-code-editor`)), session)
+output$`tutorial-exercise-extract_single_bracket_name-output` <- renderUI({
+  `tutorial-exercise-extract_single_bracket_name-result`()
+})
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "extract_single_bracket_name", global_setup = structure(c("library(learnr)", 
+"library(rmdformats)", "library(tidyr)", "library(janitor)", 
+"library(stringr)", "library(forcats)", "library(skimr)", "library(knitr)", 
+"library(gradethis)", "library(data.table)", "library(sheetcheatR)", 
+"library(reactable)", "library(dplyr)", "library(listviewer)", 
+"knitr::opts_chunk$set(", "  error = TRUE,", "  upload.fun = imgur_upload,", 
+"  fig.path = \"www/\",", "  collapse = TRUE,", "  exercise.cap = \"subsetting\",", 
+"  warning = FALSE,", "  message = FALSE,", "  dpi = 96,", "  tibble.max_extra_cols = 6,", 
+"  tibble.width = 65", ")", "options(scipen = 999999999, width = 60)", 
+"strOptions(", "  strict.width = \"yes\",", "  digits.d = 1,", 
+"  vec.len = 2,", "  list.len = 65,", "  deparse.lines = NULL", 
+")", "gradethis_setup(exercise.reveal_solution = TRUE)"), chunk_opts = list(
+    label = "setup", include = FALSE)), setup = "wu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")\nmethod_man_1b <- wu_members[4] # extract method_man_1b\ninspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b", 
+    chunks = list(list(label = "prepare_wu_members_02", code = "wu_members <- c(`Robert Fitzgerald Diggs` = \"RZA\",\n                `Gary Eldridge Gric` = \"GZA\",\n                `Russell Tyrone Jones` = \"ODB\",\n                `Clifford Smith, Jr.` = \"Method Man\",\n                `Corey Woods` = \"Raekwon\",\n                `Dennis Coles` = \"Ghostface Killah\",\n                `Jason Richard Hunter` = \"Inspectah Deck\",\n                `Lamont Jody Hawkins` = \"U-God\",\n                `Jamel Irief` = \"Masta Killa\",\n                `Darryl Hill` = \"Cappadonna\")\nmethod_man_1b <- wu_members[4] # extract method_man_1b\ninspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b", 
+        opts = list(label = "\"prepare_wu_members_02\"", echo = "FALSE"), 
+        engine = "r"), list(label = "extract_single_bracket_name", 
+        code = "____ <- wu_members[____] # extract method_man_1bn\n____ <- wu_members[____] # extract inspectah_deck_1bn\n# compare method man using identical \nidentical(x = ____, y = ____)\n# compare Inspectah Deck using identical\nidentical(x = ____, y = ____)", 
+        opts = list(label = "\"extract_single_bracket_name\"", 
+            exercise = "TRUE", exercise.lines = "6", exercise.setup = "\"prepare_wu_members_02\""), 
+        engine = "r")), code_check = NULL, error_check = NULL, 
+    check = structure("gradethis::grade_code()", chunk_opts = list(
+        label = "extract_single_bracket_name-check")), solution = structure(c("method_man_1bn <- wu_members[\"Clifford Smith, Jr.\"]", 
+    "inspectah_deck_1bn <- wu_members[\"Jason Richard Hunter\"] ", 
+    "# compare method man using identical ", "identical(x = method_man_1b, y = method_man_1bn)", 
+    "# compare Inspectah Deck using identical", "identical(x = inspectah_deck_1b, y = inspectah_deck_1bn)"
+    ), chunk_opts = list(label = "extract_single_bracket_name-solution")), 
+    tests = NULL, options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = TRUE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = FALSE, cache = 0, 
+        cache.path = "subsetting_cache/html/", cache.vars = NULL, 
+        cache.lazy = TRUE, dependson = NULL, autodep = FALSE, 
+        cache.rebuild = FALSE, fig.keep = "high", fig.show = "asis", 
+        fig.align = "default", fig.path = "www/", dev = "png", 
+        dev.args = NULL, dpi = 192, fig.ext = "png", fig.width = 6.5, 
+        fig.height = 4, fig.env = "figure", fig.cap = NULL, fig.scap = NULL, 
+        fig.lp = "fig:", fig.subcap = NULL, fig.pos = "", out.width = 624, 
+        out.height = NULL, out.extra = NULL, fig.retina = 2, 
+        external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
+        warning = FALSE, error = TRUE, message = FALSE, render = NULL, 
+        ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
+        include = TRUE, purl = TRUE, max.print = 1000, exercise.timelimit = 60, 
+        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        upload.fun = function (file, key = "9f3460e67f308f6") 
+        {
+            if (!is.character(key)) 
+                stop("The Imgur API Key must be a character string!")
+            resp = httr::POST("https://api.imgur.com/3/image.xml", 
+                config = httr::add_headers(Authorization = paste("Client-ID", 
+                  key)), body = list(image = httr::upload_file(file)))
+            httr::stop_for_status(resp, "upload to imgur")
+            res = httr::content(resp, as = "raw")
+            res = if (length(res)) 
+                xml2::as_list(xml2::read_xml(res))
+            if (packageVersion("xml2") >= "1.2.0") 
+                res <- res[[1L]]
+            if (is.null(res$link[[1]])) 
+                stop("failed to upload ", file)
+            structure(res$link[[1]], XML = res)
+        }, exercise.cap = "subsetting", tibble.max_extra_cols = 6, 
+        tibble.width = 65, exercise.reveal_solution = TRUE, label = "extract_single_bracket_name", 
+        exercise = TRUE, exercise.lines = 6, exercise.setup = "prepare_wu_members_02", 
+        code = c("____ <- wu_members[____] # extract method_man_1bn", 
+        "____ <- wu_members[____] # extract inspectah_deck_1bn", 
+        "# compare method man using identical ", "identical(x = ____, y = ____)", 
+        "# compare Inspectah Deck using identical", "identical(x = ____, y = ____)"
+        ), out.width.px = 624, out.height.px = 384, params.src = "extract_single_bracket_name, exercise=TRUE,  exercise.lines=6, exercise.setup=\"prepare_wu_members_02\"", 
+        fig.num = 0, exercise.df_print = "default"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-wu_studio_albums-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-wu_studio_albums-code-editor`)), session)
+output$`tutorial-exercise-wu_studio_albums-output` <- renderUI({
+  `tutorial-exercise-wu_studio_albums-result`()
+})
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "wu_studio_albums", global_setup = structure(c("library(learnr)", 
+"library(rmdformats)", "library(tidyr)", "library(janitor)", 
+"library(stringr)", "library(forcats)", "library(skimr)", "library(knitr)", 
+"library(gradethis)", "library(data.table)", "library(sheetcheatR)", 
+"library(reactable)", "library(dplyr)", "library(listviewer)", 
+"knitr::opts_chunk$set(", "  error = TRUE,", "  upload.fun = imgur_upload,", 
+"  fig.path = \"www/\",", "  collapse = TRUE,", "  exercise.cap = \"subsetting\",", 
+"  warning = FALSE,", "  message = FALSE,", "  dpi = 96,", "  tibble.max_extra_cols = 6,", 
+"  tibble.width = 65", ")", "options(scipen = 999999999, width = 60)", 
+"strOptions(", "  strict.width = \"yes\",", "  digits.d = 1,", 
+"  vec.len = 2,", "  list.len = 65,", "  deparse.lines = NULL", 
+")", "gradethis_setup(exercise.reveal_solution = TRUE)"), chunk_opts = list(
+    label = "setup", include = FALSE)), setup = "album <- c(\"Enter the Wu-Tang (36 Chambers)\",\n            \"Wu-Tang Forever\", \"The W\",\n            \"Iron Flag\", \"8 Diagrams\",\n            \"A Better Tomorrow\",\n            \"Once Upon a Time in Shaolin\")\nyear <- c(1993L, 1997L, 2000L, 2001L, 2007L, 2014L, 2015L)\nwu_studio_albums <- matrix(\n  data = c(album, year),\n  ncol = 2,\n  dimnames = list(c(1:7), c(\"album\", \"year\"))\n)", 
+    chunks = list(list(label = "prepare_wu_studio_albums", code = "album <- c(\"Enter the Wu-Tang (36 Chambers)\",\n            \"Wu-Tang Forever\", \"The W\",\n            \"Iron Flag\", \"8 Diagrams\",\n            \"A Better Tomorrow\",\n            \"Once Upon a Time in Shaolin\")\nyear <- c(1993L, 1997L, 2000L, 2001L, 2007L, 2014L, 2015L)\nwu_studio_albums <- matrix(\n  data = c(album, year),\n  ncol = 2,\n  dimnames = list(c(1:7), c(\"album\", \"year\"))\n)", 
+        opts = list(label = "\"prepare_wu_studio_albums\"", echo = "FALSE", 
+            eval = "TRUE"), engine = "r"), list(label = "wu_studio_albums", 
+        code = "wu_studio_albums", opts = list(label = "\"wu_studio_albums\"", 
+            exercise = "TRUE", exercise.setup = "\"prepare_wu_studio_albums\""), 
+        engine = "r")), code_check = NULL, error_check = NULL, 
+    check = NULL, solution = NULL, tests = NULL, options = list(
+        eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
+        tidy.opts = NULL, collapse = TRUE, prompt = FALSE, comment = NA, 
+        highlight = FALSE, size = "normalsize", background = "#F7F7F7", 
+        strip.white = FALSE, cache = 0, cache.path = "subsetting_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "www/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 6.5, fig.height = 4, fig.env = "figure", 
+        fig.cap = NULL, fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 624, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = FALSE, error = TRUE, 
+        message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        max.print = 1000, exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        upload.fun = function (file, key = "9f3460e67f308f6") 
+        {
+            if (!is.character(key)) 
+                stop("The Imgur API Key must be a character string!")
+            resp = httr::POST("https://api.imgur.com/3/image.xml", 
+                config = httr::add_headers(Authorization = paste("Client-ID", 
+                  key)), body = list(image = httr::upload_file(file)))
+            httr::stop_for_status(resp, "upload to imgur")
+            res = httr::content(resp, as = "raw")
+            res = if (length(res)) 
+                xml2::as_list(xml2::read_xml(res))
+            if (packageVersion("xml2") >= "1.2.0") 
+                res <- res[[1L]]
+            if (is.null(res$link[[1]])) 
+                stop("failed to upload ", file)
+            structure(res$link[[1]], XML = res)
+        }, exercise.cap = "subsetting", tibble.max_extra_cols = 6, 
+        tibble.width = 65, exercise.reveal_solution = TRUE, label = "wu_studio_albums", 
+        exercise = TRUE, exercise.setup = "prepare_wu_studio_albums", 
+        code = "wu_studio_albums", out.width.px = 624, out.height.px = 384, 
+        params.src = "wu_studio_albums, exercise=TRUE, exercise.setup=\"prepare_wu_studio_albums\"", 
+        fig.num = 0, exercise.df_print = "default"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+</li>
+</ul></li>
+</ul></li>
+</ol>
+<!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="dependencies">
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["header-attrs"]},{"type":"character","attributes":{},"value":["2.17"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pandoc"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["header-attrs.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.17"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootstrap"]},{"type":"character","attributes":{},"value":["3.3.5"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/bootstrap"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["viewport"]}},"value":[{"type":"character","attributes":{},"value":["width=device-width, initial-scale=1"]}]},{"type":"character","attributes":{},"value":["js/bootstrap.min.js","shim/html5shiv.min.js","shim/respond.min.js"]},{"type":"character","attributes":{},"value":["css/flatly.min.css"]},{"type":"character","attributes":{},"value":["<style>h1 {font-size: 34px;}\n       h1.title {font-size: 38px;}\n       h2 {font-size: 30px;}\n       h3 {font-size: 24px;}\n       h4 {font-size: 18px;}\n       h5 {font-size: 16px;}\n       h6 {font-size: 12px;}\n       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}\n       pre:not([class]) { background-color: white }<\/style>"]},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.17"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.10.7.9000"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["i18n"]},{"type":"character","attributes":{},"value":["21.6.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/i18n"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["i18next.min.js","tutorial-i18n-init.js"]},{"type":"NULL"},{"type":"character","attributes":{},"value":["<script id=\"i18n-cstm-trns\" type=\"application/json\">{\"language\":\"en\",\"resources\":{\"en\":{\"translation\":{\"button\":{\"runcode\":\"Run Code\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Hint\",\"hint_plural\":\"Hints\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Next Hint\",\"hintprev\":\"Previous Hint\",\"solution\":\"Solution\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Copy to Clipboard\",\"startover\":\"Start Over\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Continue\",\"submitanswer\":\"Submit Answer\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Previous Topic\",\"nexttopic\":\"Next Topic\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Try Again\"},\"text\":{\"startover\":\"Start Over\",\"areyousure\":\"Are you sure you want to start over? (all exercise progress will be reset)\",\"youmustcomplete\":\"You must complete the\",\"exercise\":\"exercise\",\"exercise_plural\":\"exercises\",\"inthissection\":\"in this section before continuing.\",\"code\":\"Code\",\"enginecap\":\"{{engine}} $t(text.code)\",\"quiz\":\"Quiz\",\"blank\":\"blank\",\"blank_plural\":\"blanks\",\"exercisecontainsblank\":\"This exercise contains {{count}} $t(text.blank).\",\"pleasereplaceblank\":\"Please replace {{blank}} with valid code.\",\"unparsable\":\"It looks like this might not be valid R code. R cannot determine how to turn your text into a complete command. You may have forgotten to fill in a blank, to remove an underscore, to include a comma between arguments, or to close an opening <code>&quot;<\\/code>, <code>'<\\/code>, <code>(<\\/code> or <code>{<\\/code> with a matching <code>&quot;<\\/code>, <code>'<\\/code>, <code>)<\\/code> or <code>}<\\/code>.\\n\",\"unparsablequotes\":\"<p>It looks like your R code contains specially formatted quotation marks or &quot;curly&quot; quotes (<code>{{character}}<\\/code>) around character strings, making your code invalid. R requires character values to be contained in straight quotation marks (<code>&quot;<\\/code> or <code>'<\\/code>).<\\/p> {{code}} <p>Don't worry, this is a common source of errors when you copy code from another app that applies its own formatting to text. You can try replacing the code on that line with the following. There may be other places that need to be fixed, too.<\\/p> {{suggestion}}\\n\",\"unparsableunicode\":\"<p>It looks like your R code contains an unexpected special character (<code>{{character}}<\\/code>) that makes your code invalid.<\\/p> {{code}} <p>Sometimes your code may contain a special character that looks like a regular character, especially if you copy and paste the code from another app. Try deleting the special character from your code and retyping it manually.<\\/p>\\n\",\"unparsableunicodesuggestion\":\"<p>It looks like your R code contains an unexpected special character (<code>{{character}}<\\/code>) that makes your code invalid.<\\/p> {{code}} <p>Sometimes your code may contain a special character that looks like a regular character, especially if you copy and paste the code from another app. You can try replacing the code on that line with the following. There may be other places that need to be fixed, too.<\\/p> {{suggestion}}\\n\",\"and\":\"and\",\"or\":\"or\",\"listcomma\":\", \",\"oxfordcomma\":\",\"}}},\"fr\":{\"translation\":{\"button\":{\"runcode\":\"Lancer le Code\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Indication\",\"hint_plural\":\"Indications\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Indication Suivante\",\"hintprev\":\"Indication Précédente\",\"solution\":\"Solution\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Copier dans le Presse-papier\",\"startover\":\"Recommencer\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Continuer\",\"submitanswer\":\"Soumettre\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Chapitre Précédent\",\"nexttopic\":\"Chapitre Suivant\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Réessayer\"},\"text\":{\"startover\":\"Recommencer\",\"areyousure\":\"Êtes-vous certains de vouloir recommencer? (La progression sera remise à zéro)\",\"youmustcomplete\":\"Vous devez d'abord compléter\",\"exercise\":\"l'exercice\",\"exercise_plural\":\"des exercices\",\"inthissection\":\"de cette section avec de continuer.\",\"code\":\"Code\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Quiz\",\"and\":\"et\",\"or\":\"ou\",\"oxfordcomma\":\"\"}}},\"es\":{\"translation\":{\"button\":{\"runcode\":\"Ejecutar código\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Pista\",\"hint_plural\":\"Pistas\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Siguiente pista\",\"hintprev\":\"Pista anterior\",\"solution\":\"Solución\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Copiar al portapapeles\",\"startover\":\"Reiniciar\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Continuar\",\"submitanswer\":\"Enviar respuesta\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Tema anterior\",\"nexttopic\":\"Tema siguiente\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Volver a intentar\"},\"text\":{\"startover\":\"Reiniciar\",\"areyousure\":\"¿De verdad quieres empezar de nuevo? (todo el progreso del ejercicio se perderá)\",\"youmustcomplete\":\"Debes completar\",\"exercise\":\"el ejercicio\",\"exercise_plural\":\"los ejercicios\",\"inthissection\":\"en esta sección antes de continuar.\",\"code\":\"Código\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Cuestionario\",\"and\":\"y\",\"or\":\"o\",\"oxfordcomma\":\"\"}}},\"pt\":{\"translation\":{\"button\":{\"runcode\":\"Executar código\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Dica\",\"hint_plural\":\"Dicas\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Próxima dica\",\"hintprev\":\"Dica anterior\",\"solution\":\"Solução\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Copiar para a área de transferência\",\"startover\":\"Reiniciar\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Continuar\",\"submitanswer\":\"Enviar resposta\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Tópico anterior\",\"nexttopic\":\"Próximo tópico\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Tentar novamente\"},\"text\":{\"startover\":\"Reiniciar\",\"areyousure\":\"Tem certeza que deseja começar novamente? (todo o progresso feito será perdido)\",\"youmustcomplete\":\"Você deve completar\",\"exercise\":\"o exercício\",\"exercise_plural\":\"os exercícios\",\"inthissection\":\"nesta seção antes de continuar.\",\"code\":\"Código\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Quiz\",\"and\":\"e\",\"or\":\"ou\",\"oxfordcomma\":\"\"}}},\"tr\":{\"translation\":{\"button\":{\"runcode\":\"Çalıştırma Kodu\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Ipucu\",\"hint_plural\":\"İpuçları\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Sonraki İpucu\",\"hintprev\":\"Önceki İpucu\",\"solution\":\"Çözüm\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Pano'ya Kopyala\",\"startover\":\"Baştan Başlamak\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Devam et\",\"submitanswer\":\"Cevabı onayla\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Önceki Konu\",\"nexttopic\":\"Sonraki Konu\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Tekrar Deneyin\"},\"text\":{\"startover\":\"Baştan Başlamak\",\"areyousure\":\"Baştan başlamak istediğinizden emin misiniz? (tüm egzersiz ilerlemesi kaybolacak)\",\"youmustcomplete\":\"Tamamlamalısın\",\"exercise\":\"egzersiz\",\"exercise_plural\":\"egzersizler\",\"inthissection\":\"devam etmeden önce bu bölümde\",\"code\":\"Kod\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Sınav\",\"oxfordcomma\":\"\"}}},\"emo\":{\"translation\":{\"button\":{\"runcode\":\"🏃\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"💡\",\"hint_plural\":\"$t(button.hint)\",\"hinttitle\":\"$t(button.hint)\",\"solution\":\"🎯\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"📋\",\"startover\":\"⏮\",\"startovertitle\":\"Start Over\",\"continue\":\"✅\",\"submitanswer\":\"🆗\",\"submitanswertitle\":\"Submit Answer\",\"previoustopic\":\"⬅\",\"nexttopic\":\"➡\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"🔁\"},\"text\":{\"startover\":\"⏮\",\"areyousure\":\"🤔\",\"youmustcomplete\":\"⚠️ 👉 🧑‍💻\",\"exercise\":\"\",\"exercise_plural\":\"\",\"inthissection\":\"\",\"code\":\"💻\",\"enginecap\":\"$t(text.code) {{engine}}\",\"oxfordcomma\":\"\"}}},\"eu\":{\"translation\":{\"button\":{\"runcode\":\"Kodea egikaritu\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Laguntza\",\"hint_plural\":\"Laguntza\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Aurreko laguntza\",\"hintprev\":\"Hurrengo laguntza\",\"solution\":\"Ebazpena\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Arbelean kopiatu\",\"startover\":\"Berrabiarazi\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Jarraitu\",\"submitanswer\":\"Erantzuna bidali\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Aurreko atala\",\"nexttopic\":\"Hurrengo atala\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Berriro saiatu\"},\"text\":{\"startover\":\"Berrabiarazi\",\"areyousure\":\"Berriro hasi nahi duzu? (egindako lana galdu egingo da)\",\"youmustcomplete\":\"Aurrera egin baino lehen atal honetako\",\"exercise\":\"ariketa egin behar duzu.\",\"exercise_plural\":\"ariketak egin behar dituzu.\",\"inthissection\":\"\",\"code\":\"Kodea\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Galdetegia\",\"oxfordcomma\":\"\"}}},\"de\":{\"translation\":{\"button\":{\"runcode\":\"Code ausführen\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Tipp\",\"hint_plural\":\"Tipps\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Nächster Tipp\",\"hintprev\":\"Vorheriger Tipp\",\"solution\":\"Lösung\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"In die Zwischenablage kopieren\",\"startover\":\"Neustart\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Weiter\",\"submitanswer\":\"Antwort einreichen\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Vorheriges Kapitel\",\"nexttopic\":\"Nächstes Kapitel\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Nochmal versuchen\"},\"text\":{\"startover\":\"Neustart\",\"areyousure\":\"Bist du sicher, dass du neustarten willst? (der gesamte Lernfortschritt wird gelöscht)\",\"youmustcomplete\":\"Vervollstädinge\",\"exercise\":\"die Übung\",\"exercise_plural\":\"die Übungen\",\"inthissection\":\"in diesem Kapitel, bevor du fortfährst.\",\"code\":\"Code\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Quiz\",\"blank\":\"Lücke\",\"blank_plural\":\"Lücken\",\"pleasereplaceblank\":\"Bitte ersetze {{blank}} mit gültigem Code.\",\"unparsable\":\"Dies scheint kein gültiger R Code zu sein. R kann deinen Text nicht in einen gültigen Befehl übersetzen. Du hast vielleicht vergessen, die Lücke zu füllen, einen Unterstrich zu entfernen, ein Komma zwischen Argumente zu setzen oder ein eröffnendes <code>&quot;<\\/code>, <code>'<\\/code>, <code>(<\\/code> oder <code>{<\\/code> mit einem zugehörigen <code>&quot;<\\/code>, <code>'<\\/code>, <code>)<\\/code> oder <code>}<\\/code> zu schließen.\\n\",\"and\":\"und\",\"or\":\"oder\",\"listcomma\":\", \",\"oxfordcomma\":\",\"}}},\"ko\":{\"translation\":{\"button\":{\"runcode\":\"코드 실행\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"힌트\",\"hint_plural\":\"힌트들\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"다음 힌트\",\"hintprev\":\"이전 힌트\",\"solution\":\"솔루션\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"클립보드에 복사\",\"startover\":\"재학습\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"다음 학습으로\",\"submitanswer\":\"정답 제출\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"이전 토픽\",\"nexttopic\":\"다음 토픽\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"재시도\"},\"text\":{\"startover\":\"재학습\",\"areyousure\":\"다시 시작 하시겠습니까? (모든 예제의 진행 정보가 재설정됩니다)\",\"youmustcomplete\":\"당신은 완료해야 합니다\",\"exercise\":\"연습문제\",\"exercise_plural\":\"연습문제들\",\"inthissection\":\"이 섹션을 실행하기 전에\",\"code\":\"코드\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"퀴즈\",\"blank\":\"공백\",\"blank_plural\":\"공백들\",\"exercisecontainsblank\":\"이 연습문제에는 {{count}}개의 $t(text.blank)이 포함되어 있습니다.\",\"pleasereplaceblank\":\"{{blank}}를 유효한 코드로 바꾸십시오.\",\"unparsable\":\"이것은 유효한 R 코드가 아닐 수 있습니다. R은 텍스트를 완전한 명령으로 변환하는 방법을 결정할 수 없습니다. 당신은 공백이나 밑줄을 대체하여 채우기, 인수를 컴마로 구분하기, 또는 <code>&quot;<\\/code>, <code>'<\\/code>, <code>(<\\/code> , <code>{<\\/code>로 시작하는 구문을 닫는 <code>&quot;<\\/code>, <code>'<\\/code>, <code>)<\\/code>, <code>}<\\/code>을 잊었을 수도 있습니다.\\n\",\"and\":\"그리고\",\"or\":\"혹은\",\"listcomma\":\", \",\"oxfordcomma\":\"\"}}},\"zh\":{\"translation\":{\"button\":{\"runcode\":\"运行代码\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"提示\",\"hint_plural\":\"提示\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"下一个提示\",\"hintprev\":\"上一个提示\",\"solution\":\"答案\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"复制到剪切板\",\"startover\":\"重新开始\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"继续\",\"submitanswer\":\"提交答案\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"上一专题\",\"nexttopic\":\"下一专题\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"再试一次\"},\"text\":{\"startover\":\"重置\",\"areyousure\":\"你确定要重新开始吗? (所有当前进度将被重置)\",\"youmustcomplete\":\"你必须完成\",\"exercise\":\"练习\",\"exercise_plural\":\"练习\",\"inthissection\":\"在进行本节之前\",\"code\":\"代码\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"测试\",\"blank\":\"空\",\"blank_plural\":\"空\",\"exercisecontainsblank\":\"本练习包含{{count}}个$t(text.blank)\",\"pleasereplaceblank\":\"请在{{blank}}内填写恰当的代码\",\"unparsable\":\"这似乎不是有效的R代码。 R不知道如何将您的文本转换为完整的命令。 您是否忘了填空，忘了删除下划线，忘了在参数之间包含逗号，或者是忘了用<code>&quot;<\\/code>, <code>'<\\/code>, <code>)<\\/code>,<code>}<\\/code>来封闭<code>&quot;<\\/code>, <code>'<\\/code>, <code>(<\\/code>。 or <code>{<\\/code>。\\n\",\"unparsablequotes\":\"<p>您的R代码中似乎含有特殊格式的引号，或者弯引号(<code>{{character}}<\\/code>) 在字符串前后，在R中字符串应该被直引号(<code>&quot;<\\/code> 或者 <code>'<\\/code>)包裹。<\\/p> {{code}} <p>别担心，该错误经常在复制粘贴包含格式的代码时遇到， 您可以尝试将该行中的代码替换为以下代码，也许还有其他地方需要修改。<\\/p> {{suggestion}}\\n\",\"unparsableunicode\":\"<p>您的代码中似乎包含有异常字符(<code>{{character}}<\\/code>),导致代码无效。<\\/p> {{code}} <p>有时候你的代码可能含有看似正常字符的特殊字符，特别是当你复制粘贴其他来源代码的时候。 请试着删除这些特殊字符,重新输入<\\/p>\\n\",\"unparsableunicodesuggestion\":\"<p>您的代码中似乎包含有异常字符(<code>{{character}}<\\/code>),导致代码无效。<\\/p> {{code}} <p>有时候你的代码可能含有看似正常字符的特殊字符，特别是当你复制粘贴其他来源代码的时候。 请试着删除这些特殊字符,重新输入<\\/p>\\n\",\"and\":\"且\",\"or\":\"或\",\"listcomma\":\",\",\"oxfordcomma\":\",\"}}},\"pl\":{\"translation\":{\"button\":{\"runcode\":\"Uruchom kod\",\"runcodetitle\":\"$t(button.runcode) ({{kbd}})\",\"hint\":\"Podpowiedź\",\"hint_plural\":\"Podpowiedzi\",\"hinttitle\":\"$t(button.hint)\",\"hintnext\":\"Następna podpowiedź\",\"hintprev\":\"Poprzednia podpowiedź\",\"solution\":\"Rozwiązanie\",\"solutiontitle\":\"$t(button.solution)\",\"copyclipboard\":\"Kopiuj do schowka\",\"startover\":\"Zacznij od początku\",\"startovertitle\":\"$t(button.startover)\",\"continue\":\"Kontynuuj\",\"submitanswer\":\"Wyślij\",\"submitanswertitle\":\"$t(button.submitanswer)\",\"previoustopic\":\"Poprzednia sekcja\",\"nexttopic\":\"Następna sekcja\",\"questionsubmit\":\"$t(button.submitanswer)\",\"questiontryagain\":\"Spróbuj ponownie\"},\"text\":{\"startover\":\"Zacznij od początku\",\"areyousure\":\"Czy na pewno chcesz zacząć od początku? (cały postęp w zadaniu zostanie utracony)\",\"youmustcomplete\":\"Musisz ukończyć\",\"exercise\":\"ćwiczenie\",\"exercise_plural\":\"ćwiczenia\",\"inthissection\":\"w tej sekcji przed kontynuowaniem\",\"code\":\"Kod\",\"enginecap\":\"$t(text.code) {{engine}}\",\"quiz\":\"Quiz\",\"blank\":\"luka\",\"blank_plural\":\"luk(i)\",\"exercisecontainsblank\":\"To ćwiczenie zawiera {{count}} $t(text.blank).\",\"pleasereplaceblank\":\"Proszę uzupełnić {{blank}} prawidłowym kodem.\",\"unparsable\":\"Wygląda na to, że może to nie być prawidłowy kod R. R nie jest w stanie przetworzyć Twojego tekstu na polecenie. Mogłeś(-aś) zapomnieć wypełnić luki, usunąć podkreślnik, umieścić przecinka między argumentami, lub zamknąć znak <code>&quot;<\\/code>, <code>'<\\/code>, <code>(<\\/code> lub <code>{<\\/code> odpowiadającym <code>&quot;<\\/code>, <code>'<\\/code>, <code>)<\\/code> lub <code>}<\\/code>.\\n\",\"unparsablequotes\":\"<p>Wygląda na to, że Twój kod zawiera szczególnie sformatowane cudzysłowy lub cudzysłowy typograficzne (<code>{{character}}<\\/code>) przy ciągach znaków, co sprawia, że kod jest niepoprawny. R wymaga cudzysłowów prostych (<code>&quot;<\\/code> albo <code>'<\\/code>).<\\/p> {{code}} <p>Nie martw się, to powszechne źródło błędów, gdy kopiuje się kod z innego programu, który sam formatuje teskt. Możesz spróbować zastąpić swój kod następującym kodem. Mogą być też inne miejsca, które wymagają poprawienia.<\\/p> {{suggestion}}\\n\",\"unparsableunicode\":\"<p>Wygląda na to, że Twój kod zawiera niespodziewany znak specjalny (<code>{{character}}<\\/code>), co sprawia, że kod jest niepoprawny.<\\/p> {{code}} <p>Czasami Twój kod może zawierać znak specjalny, który wygląda jak zwykły znak, zwłaszcza jeśli kopiujesz kod z innego programu. Spróbuj usunąć znak specjalny i wpisać do ponownie ręcznie.<\\/p>\\n\",\"unparsableunicodesuggestion\":\"<p>Wygląda na to, że Twój kod zawiera niespodziewany znak specjalny (<code>{{character}}<\\/code>), co sprawia, że kod jest niepoprawny.<\\/p> {{code}} <p>Czasami Twój kod może zawierać znak specjalny, który wygląda jak zwykły znak, zwłaszcza jeśli kopiujesz kod z innego programu. Możesz spróbować zastąpić swój kod następującym kodem. Mogą być też inne miejsca, które wymagają poprawienia.<\\/p> {{suggestion}}\\n\",\"and\":\"i\",\"or\":\"lub\",\"listcomma\":\", \",\"oxfordcomma\":\"\"}}}}}<\/script>"]},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-format"]},{"type":"character","attributes":{},"value":["0.10.7.9000"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmarkdown/templates/tutorial/resources"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-format.js"]},{"type":"character","attributes":{},"value":["tutorial-format.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["navigation"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/navigation-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tabsets.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.17"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["9.12.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["default.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.17"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["5.1.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.css","css/v4-shims.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.17"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootbox"]},{"type":"character","attributes":{},"value":["5.5.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/bootbox"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["bootbox.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["idb-keyvalue"]},{"type":"character","attributes":{},"value":["3.2.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/idb-keyval"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["idb-keyval-iife-compat.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.10.7.9000"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.4.14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.4.14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.4.14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.4.14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.7.9000"]}]}]}
+</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="execution_dependencies">
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","base64enc","bookdown","bslib","cachem","checkmate","cli","colorspace","compiler","curl","data.table","datasets","DBI","digest","dplyr","ellipsis","evaluate","fansi","fastmap","forcats","generics","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","highr","htmltools","htmlwidgets","httpuv","janitor","jquerylib","jsonlite","knitr","later","learnr","lifecycle","listviewer","lubridate","magrittr","markdown","methods","mime","munsell","patchwork","pillar","pkgconfig","promises","purrr","R6","Rcpp","reactable","repr","rlang","rmarkdown","rmdformats","rprojroot","rstudioapi","sass","scales","sheetcheatR","shiny","skimr","snakecase","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","utf8","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.4.1","4.2.1","0.1-3","0.29","0.4.0","1.0.6","2.1.0","3.4.1","2.0-3","4.2.1","4.3.3","1.14.2","4.2.1","1.1.3","0.6.29","1.0.10","0.3.2","0.17","1.0.3","1.1.0","0.5.2","0.1.3","3.3.6","1.6.2","0.2.10.9000","4.2.1","4.2.1","4.2.1","0.3.1","0.9","0.5.3","1.5.4","1.6.6","2.1.0","0.1.4","1.8.2","1.40","1.3.0","0.10.7.9000","1.0.3","3.0.0","1.8.0","2.0.3","1.1","4.2.1","0.12","0.5.0","1.1.2","1.8.1","2.0.3","1.2.0.1","0.3.5","2.5.1","1.0.9","0.3.0","1.1.4","1.0.6","2.17","1.0.4","2.0.3","0.14","0.4.2","1.2.1","0.1.1","1.7.2","2.1.4","0.11.0","4.2.1","1.7.8","1.4.1","3.1.8","1.2.1","1.1.2","4.2.1","1.2.2","4.2.1","0.4.2","2.5.0","0.33","1.8-4","2.3.5"]}]}]}
+</script>
+<!--/html_preserve-->
+</div>
+
+</article> <!-- topics -->
+
+<div class="topicsContainer">
+<div class="topicsPositioner">
+<div class="band">
+<div class="bandContent topicsListContainer">
+
+<!-- begin doc-metadata -->
+<div id="doc-metadata">
+<h1 class="title toc-ignore" style="display:none;">Subsetting data in
+R</h1>
+</div>
+<!-- end doc-metadata -->
+
+</div> <!-- bandContent.topicsListContainer -->
+</div> <!-- band -->
+</div> <!-- topicsPositioner -->
+</div> <!-- topicsContainer -->
+
+
+</main> <!-- bandContent page -->
+</div> <!-- pageContent band -->
+
+
+
+<!-- Build Tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("section-TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<script>
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<script>
+$(document).ready(function () {
+  $(".ace_editor").each(function(i, el) {
+    window.ace.edit(el).setTheme("ace/theme/nord_dark")
+  });
+});
+</script>
+
+</body>
+
+</html>

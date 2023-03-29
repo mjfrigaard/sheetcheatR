@@ -1,0 +1,182 @@
+---
+title: "Data tidying with tidyr (part 2)"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    df_print: default
+    includes:
+      in_header: resizer.html
+runtime: shiny_prerendered
+description: >
+  Restructure and reshape data with tidyr.
+---
+
+```{r setup, include = FALSE}
+library(learnr)
+library(tidyverse)
+library(googlesheets4)
+library(skimr)
+library(knitr)
+library(readxl)
+library(reactable)
+library(writexl)
+library(openxlsx)
+library(fivethirtyeight)
+library(datapasta)
+library(gt)
+library(flextable)
+# pipe url: ----
+# https://bit.ly/01-file-txt 
+# CSV url: ----
+# https://bit.ly/01-file-csv 
+# CSV2 url: ----
+# https://bit.ly/01-file2-csv 
+# TSV url: ----
+# https://bit.ly/01-file-tsv 
+# f1.csv: ----
+# https://bit.ly/01-f1-csv 
+# f2.csv: ----
+# https://bit.ly/01-f2-csv
+# f3.csv: ----
+# https://bit.ly/01-f3-csv 
+knitr::opts_chunk$set(
+  upload.fun = imgur_upload, 
+  error = TRUE,
+  exercise.cap = "tidyr")
+```
+
+[Link to `tidyr` website](https://tidyr.tidyverse.org/)  
+[Link to cheatsheets](https://www.rstudio.com/resources/cheatsheets/) 
+
+## The cheatsheet (part 2)
+
+```{r tidyr-p2.png, echo=FALSE, fig.align='center', out.height='100%', out.width='100%'}
+knitr::include_graphics(path = "www/tidyr-p2.png")
+```
+
+> "*The `tidyr` package provides a framework for creating and shaping tidy data, the data format that works the most seamlessly with R and the `tidyverse`....*
+> ***The back page provides an overview of creating, reshaping, and transforming nested data and list-columns with `tidyr`, `tibble`, and `dplyr`.*** *With list-columns, you can use a simple data frame to organize any collection of objects in R.*"
+
+Access the full cheatsheet [here](https://raw.githubusercontent.com/rstudio/cheatsheets/main/tidyr.pdf).
+
+This tutorial covers the back page of the `tidyr` cheatsheet, which includes various functions for reshaping ('tidying') data in RStudio. View the tutorial for the front page here. The goal of this tutorial is to show what the contents of the cheatsheet look like in your RStudio console. 
+
+Below we install and load the packages:
+
+```{r packages, eval=FALSE}
+install.packages(c("tidyr", "dplyr", "tibble"))
+library(tidyr)
+library(dplyr)
+library(tibble)
+```
+
+## Nested Data
+
+> "*A nested data frame stores individual tables as a list-column of data frames within a larger organizing data frame. List-columns can also be lists of vectors or lists of varying data types.*"
+
+Nested data sounds crazy (a dataset *within* a dataset?!?), but it makes more sense if you consider the class and structure of tibbles/data.frames and lists. 
+
+Consider the `swdata` dataset below (a subset of columns from the [`dplyr::starwars` data](https://dplyr.tidyverse.org/reference/starwars.html)): 
+
+```{r prepare-starwars, echo=FALSE, eval=TRUE}
+library(dplyr)
+swdata <- select(dplyr::starwars, 
+  name, homeworld, species, films, vehicles, starships)
+swdata <- head(swdata, n = 5)
+```
+
+```{r , echo=FALSE}
+swdata <- structure(list(
+  name = c(
+    "Luke Skywalker", "C-3PO", "R2-D2", "Darth Vader",
+    "Leia Organa"
+  ), homeworld = c(
+    "Tatooine", "Tatooine", "Naboo",
+    "Tatooine", "Alderaan"
+  ), species = c(
+    "Human", "Droid", "Droid",
+    "Human", "Human"
+  ), films = list(c(
+    "The Empire Strikes Back",
+    "Revenge of the Sith", "Return of the Jedi", "A New Hope", "The Force Awakens"
+  ), c(
+    "The Empire Strikes Back", "Attack of the Clones", "The Phantom Menace",
+    "Revenge of the Sith", "Return of the Jedi", "A New Hope"
+  ), c(
+    "The Empire Strikes Back",
+    "Attack of the Clones", "The Phantom Menace", "Revenge of the Sith",
+    "Return of the Jedi", "A New Hope", "The Force Awakens"
+  ), c(
+    "The Empire Strikes Back",
+    "Revenge of the Sith", "Return of the Jedi", "A New Hope"
+  ), c(
+    "The Empire Strikes Back",
+    "Revenge of the Sith", "Return of the Jedi", "A New Hope", "The Force Awakens"
+  )), vehicles = list(
+    c("Snowspeeder", "Imperial Speeder Bike"),
+    character(0), character(0), character(0), "Imperial Speeder Bike"
+  ),
+  starships = list(
+    c("X-wing", "Imperial shuttle"), character(0),
+    character(0), "TIE Advanced x1", character(0)
+  )
+), row.names = c(
+  NA,
+  -5L
+), class = c("tbl_df", "tbl", "data.frame"))
+reactable::reactable(data = swdata,
+compact = TRUE,
+columns = list(
+  name = colDef(name = "name", sticky = "left")))
+```
+
+We've included three character columns (`name`, `homeworld`, `species`) and three list columns (`films`, `vehicles`, `starships`) from the original dataset. Use the code block below to view the `typeof()`, `str()`, and `class()` of `swdata`.  
+
+```{r nested-explore-starwars, exercise=TRUE, exercise.lines=6, exercise.setup="prepare-starwars"}
+# view the typeof 
+typeof(x = swdata)
+# view the str 
+
+# view the class 
+
+```
+
+
+
+### Creating nested data
+
+#### nest()
+
+## Creating tibbles with list-columns
+
+## Reshape nested data 
+
+### unnest() 
+
+### unnest_longer()
+
+### unnest_wider() 
+
+### hoist() 
+
+## Transform Nested Data
+
+### dplyr::rowwise()
+
+#### Create a new list-column
+
+#### Create a regular column
+
+#### Collapse multiple list-columns
+
+#### Transform multiple list-columns
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,502 @@
+---
+title: "Subsetting data in R"
+description: >
+  Subsetting objects in R allows you to extract an element (or elements) from any 
+  data object.
+  
+output: 
+  learnr::tutorial:
+    highlight: tango
+    theme: flatly
+    ace_theme: nord_dark
+    progressive: true
+    allow_skip: true
+    df_print: default
+    
+runtime: shiny_prerendered
+---
+
+```{r setup, include = FALSE}
+library(learnr)
+library(rmdformats)
+library(tidyr)
+library(janitor)
+library(stringr)
+library(forcats)
+library(skimr)
+library(knitr)
+library(gradethis)
+library(data.table)
+library(sheetcheatR)
+library(reactable)
+library(dplyr)
+library(listviewer)
+knitr::opts_chunk$set(
+  error = TRUE,
+  upload.fun = imgur_upload,
+  fig.path = "www/",
+  collapse = TRUE,
+  exercise.cap = "subsetting",
+  warning = FALSE,
+  message = FALSE,
+  dpi = 96,
+  tibble.max_extra_cols = 6,
+  tibble.width = 65
+)
+options(scipen = 999999999, width = 60)
+strOptions(
+  strict.width = "yes",
+  digits.d = 1,
+  vec.len = 2,
+  list.len = 65,
+  deparse.lines = NULL
+)
+gradethis_setup(exercise.reveal_solution = TRUE)
+```
+
+## Overview
+
+When we want to extract or replace an element from an existing object in R, the term for this action is [subsetting.](https://adv-r.hadley.nz/subsetting.html). There isn't a cheatsheet dedicated to subsetting, but there probably should be :) 
+
+Subsetting can be challenging if you're new to R. These exercises are not an exhaustive list of all subsetting cases, but should hopefully provide you with enough knowledge to get you pointed in the right direction. 
+
+We're going to cover following topics:
+
+1. The index brackets (`[` & `[[`) and the dollar sign (`$`)   
+2. Extraction  
+    - Extracting multiple elements 
+    - Extracting a single element 
+3. Replacement  
+    - Replacing multiple elements 
+    - Replacing a single element
+4. Removal 
+    - Removing multiple elements 
+    - Removing a single element
+
+
+###
+    
+### Enter the Wu
+    
+These exercises use data from the [Wu-Tang Clan](https://en.wikipedia.org/wiki/Wu-Tang_Clan), an American hip-hop group. 
+<br><br>
+
+```{r Wu_Tang_Clan_on_Stage, echo=FALSE, fig.cap="source: https://en.wikipedia.org/wiki/Wu-Tang_Clan", out.height='90%', out.width='90%', fig.align='center'}
+knitr::include_graphics(path = "https://upload.wikimedia.org/wikipedia/commons/8/80/Wu_Tang_Clan_on_Stage.jpg")
+```
+    
+### Elements, names, and values
+
+We're going to start with a vector of [Wu-Tang Clan](https://en.wikipedia.org/wiki/Wu-Tang_Clan) members. View it's contents below:
+
+```{r prepare_preview_wu_members, echo=FALSE, eval=TRUE}
+# correct!
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Clifford Smith, Jr.` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspectah Deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+```
+
+```{r preview_wu_members, echo=TRUE}
+wu_members
+```
+
+###
+
+We're going to clear up some jargon before we move ahead. The `wu_members` vector has ten **elements**, and each element has **value** and **name** attribute. For example, if check the attributes of `wu_members`, we see the following:
+
+```{r attributes, eval=FALSE}
+# check attributes
+attributes(wu_members)
+## $names
+## [1] "Robert Fitzgerald Diggs" "Gary Eldridge Gric"      "Russell Tyrone Jones"   
+## [4] "Clifford Smith, Jr."     "Corey Woods"             "Dennis Coles"           
+## [7] "Jason Richard Hunter"    "Lamont Jody Hawkins"     "Jamel Irief"            
+## [10] "Darryl Hill"  
+```
+
+###
+
+We can see the `$names` attribute is a set of character values (one for each value in `wu_members`). If we deconstruct `wu_members` with `dput()`, we can see these are created in `` `name` = "value" `` pairs.
+
+```{r deconstruct, eval=FALSE}
+# deconstruct 
+dput(wu_members)
+##  c(`Robert Fitzgerald Diggs` = "RZA",
+##    `Gary Eldridge Gric` = "GZA",
+##    `Russell Tyrone Jones` = "ODB",
+##    `Andre Romelle Young` = "Method Man",
+##    `Corey Woods` = "Raekwon",
+##    `Dennis Coles` = "Ghostface Killah",
+##    `Jason Richard Hunter` = "Inspectah Deck",
+##    `Lamont Jody Hawkins` = "U-God",
+##    `Jamel Irief` = "Masta Killa",
+##    `Darryl Hill` = "Cappadonna")
+```
+
+###
+
+`$names` are important when we're subsetting because they're an attribute we can use them to locate elements in an object, but they are not the element values. 
+
+###
+
+The figure below displays how to think about elements, names, and values for the first two elements in `wu_members`:
+
+```{r element-name-value, echo=FALSE, fig.align='center', out.width='80%', out.height='80%'}
+knitr::include_graphics("www/element-name-value.png")
+```
+
+## `[` , `[[` and `$`  
+
+The index brackets come in two flavors: single brackets `[x]` or double brackets `[[x]]`. **The `[` operator will extract or replace multiple elements, and the `[[` operator will extract or replace a single element.**
+
+###
+
+How each set of brackets works depend on: 
+
+1) their placement with respect the assignment operator (`<-`),   
+2) the object they're being used with (vectors, matrices, data.frames, lists, etc.), and   
+3) the value provided (`x`).
+
+### 
+
+Hidden away in the help documentation (<code>?\`[[\`</code>) is a very important point about the three subsetting operators:
+
+> *The most important distinction between `[`, `[[` and `$` is that the `[` can select more than one element whereas the other two select a single element.*
+
+###
+
+As stated above, `$` and `[[` are similar. However, `$` only works on recursive objects, like `lists` and `data.frame`s.
+
+## Extraction, Replacement, and Removal 
+
+**Extraction** is used when we want a reduced portion (i.e. *subset*) of an object, or if we want to convert an object into a less complex structure (i.e. from a `data.frame` or `list` to a `vector`). 
+
+**Replacement** is 
+
+**Removal** is
+
+## Extracting multiple elements
+
+The following exercises will demonstrate various methods of extracting multiple elements from objects in R. We've also included the code to reproduce the objects in your own R session.   
+
+### Extracting multiple elements (vectors)
+
+```{r prepare_wu_members, echo=FALSE}
+# correct!
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Clifford Smith, Jr.` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspectah Deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+```
+
+Let's revisit our named list of `wu_members`. 
+
+```{r code-wu_members, eval=FALSE}
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Clifford Smith, Jr.` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspectah Deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+```
+
+###
+
+View `wu_members` in the code chunk by clicking on the **Run Code** button:
+
+```{r vectors_sb_wu_members, exercise=TRUE,  exercise.lines=2, exercise.setup="prepare_wu_members"}
+wu_members
+```
+
+###
+
+If we want to extract an element from a vector with single brackets, we can use numerical indexes or names (in quotes).
+
+###
+
+In the code block below,
+
+1.  Extract the 4th and 7th elements in `wu_members` by placing single index brackets on the right-side of the assignment operator\
+2.  Assign the extracted elements to `method_man_1b` and `inspectah_deck_1b`  
+3.  Print `method_man_1b` and `inspectah_deck_1b` to the screen on the following lines.
+
+```{r extract_single_bracket, exercise=TRUE,  exercise.lines=4, exercise.setup="prepare_wu_members"}
+____ <- wu_members[____] # extract method_man_1b
+____ <- wu_members[____] # extract inspectah_deck_1b
+____
+____
+```
+
+```{r extract_single_bracket-solution}
+method_man_1b <- wu_members[4] # extract method_man_1b
+inspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b
+method_man_1b
+inspectah_deck_1b
+```
+
+```{r extract_single_bracket-check}
+gradethis::grade_code()
+```
+
+###
+
+As we mentioned above, the `$names` attribute can be used to subset the values `wu_members` (just like their numerical positions).
+
+```{r prepare_wu_members_02, echo=FALSE}
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Clifford Smith, Jr.` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspectah Deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+method_man_1b <- wu_members[4] # extract method_man_1b
+inspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b
+```
+
+In the code block below,
+
+1.  Extract the elements with the `"Clifford Smith, Jr."` and `"Jason Richard Hunter"` names in `wu_members`, using single index brackets on the right-side of the assignment operator   
+
+2.  Assign the extracted elements to `method_man_1bn` (for '1 bracket, named') and `inspectah_deck_1bn` 
+
+3.  Compare `method_man_1b` to `method_man_1bn` and `inspectah_deck_1bn` to `inspectah_deck_1bn` with the two `identical()` functions on the following lines
+
+```{r extract_single_bracket_name, exercise=TRUE,  exercise.lines=6, exercise.setup="prepare_wu_members_02"}
+____ <- wu_members[____] # extract method_man_1bn
+____ <- wu_members[____] # extract inspectah_deck_1bn
+# compare method man using identical 
+identical(x = ____, y = ____)
+# compare Inspectah Deck using identical
+identical(x = ____, y = ____)
+```
+
+```{r extract_single_bracket_name-solution}
+method_man_1bn <- wu_members["Clifford Smith, Jr."]
+inspectah_deck_1bn <- wu_members["Jason Richard Hunter"] 
+# compare method man using identical 
+identical(x = method_man_1b, y = method_man_1bn)
+# compare Inspectah Deck using identical
+identical(x = inspectah_deck_1b, y = inspectah_deck_1bn)
+```
+
+```{r extract_single_bracket_name-check}
+gradethis::grade_code()
+```
+
+### Extracting multiple elements (matrices and arrays)
+
+```{r prepare_wu_studio_albums, echo=FALSE, eval=TRUE}
+album <- c("Enter the Wu-Tang (36 Chambers)",
+            "Wu-Tang Forever", "The W",
+            "Iron Flag", "8 Diagrams",
+            "A Better Tomorrow",
+            "Once Upon a Time in Shaolin")
+year <- c(1993L, 1997L, 2000L, 2001L, 2007L, 2014L, 2015L)
+wu_studio_albums <- matrix(
+  data = c(album, year),
+  ncol = 2,
+  dimnames = list(c(1:7), c("album", "year"))
+)
+```
+
+Below we have a matrix of [Wu-Tang Clan](https://en.wikipedia.org/wiki/Wu-Tang_Clan#Studio_albums) studio albums.
+
+```{r code-wu_studio_albums, eval=FALSE}
+album <- c("Enter the Wu-Tang (36 Chambers)",
+            "Wu-Tang Forever", "The W",
+            "Iron Flag", "8 Diagrams",
+            "A Better Tomorrow",
+            "Once Upon a Time in Shaolin")
+year <- c(1993L, 1997L, 2000L, 2001L, 2007L, 2014L, 2015L)
+wu_studio_albums <- matrix(
+  data = c(album, year),
+  ncol = 2,
+  dimnames = list(c(1:7), c("album", "year"))
+)
+```
+
+View it in the code chunk by clicking on the **Run Code** button:
+
+```{r wu_studio_albums, exercise=TRUE, exercise.setup="prepare_wu_studio_albums"}
+wu_studio_albums
+```
+
+### Extracting multiple elements (lists)
+
+
+### Extracting multiple elements (data frames)
+
+```{r prepare_wu_small, echo=FALSE}
+wu_small <- data.frame(
+            member = c("RZA","GZA","ODB",
+                       "Method Man","Raekwon","Ghostface Killah", 
+                       "Inspectah Deck", "U-God","Masta Killa", 
+                        "Cappadonna"),
+              born = c(1969L,1966L,1968L,1971L,
+                       1970L,1970L,1970L,1970L,1969L,1968L),
+             alive = c(TRUE,TRUE,FALSE,TRUE,TRUE,
+                       TRUE,TRUE,TRUE,TRUE,TRUE)
+)
+```
+
+## Extracting a single element 
+
+### Extracting a single element (vectors)
+
+### Extracting a single element (matrices and arrays)  
+
+### Extracting a single element (lists)
+
+### Extracting a single element (data frames)
+      
+## Replacement  
+
+### Replacing multiple elements 
+
+- vectors  
+- matrices and arrays  
+- lists  
+- data frames
+
+### Replacing a single element
+
+- vectors  
+
+```{r prepare_broken_wu_members, echo=FALSE}
+# Clifford Smith, Jr. = method man's real name
+# Inspectah Deck != Inspector deck
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Andre Romelle Young` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspector deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+# # check
+# identical(
+#   x = names(x = wu_members)[4] <- "Clifford Smith, Jr.", 
+#   y = names(x = wu_members)[[4]] <- "Clifford Smith, Jr.")
+# identical(
+#   x = wu_members[7] <- "Inspectah Deck", 
+#   y = wu_members[[7]] <- "Inspectah Deck")
+```
+
+```{r prepare_extract_single_bracket_name, echo=FALSE}
+wu_members <- c(`Robert Fitzgerald Diggs` = "RZA",
+                `Gary Eldridge Gric` = "GZA",
+                `Russell Tyrone Jones` = "ODB",
+                `Andre Romelle Young` = "Method Man",
+                `Corey Woods` = "Raekwon",
+                `Dennis Coles` = "Ghostface Killah",
+                `Jason Richard Hunter` = "Inspector deck",
+                `Lamont Jody Hawkins` = "U-God",
+                `Jamel Irief` = "Masta Killa",
+                `Darryl Hill` = "Cappadonna")
+method_man_1b <- wu_members[4] # extract method_man_1b
+inspectah_deck_1b <- wu_members[7] # extract inspectah_deck_1b
+```
+
+### 
+
+Die-hard fans will notice two errors in `wu_members`:
+
+1.  `Andre Romelle Young` isn't `"Method Man"`'s real name--it's [**`Clifford Smith, Jr.`**](https://en.wikipedia.org/wiki/Method_Man)
+
+<!-- ![](https://upload.wikimedia.org/wikipedia/commons/a/a5/Method_Man_at_Shattuck_Down_Low.jpg){ width=40% height=40%} -->
+
+```{r method_man-jpg, fig.cap="https://en.wikipedia.org/wiki/Method_Man", fig.align='center', echo=FALSE, out.height='20%', out.width='20%'}
+knitr::include_graphics(path = "www/method_man.jpg")
+```
+
+2.  `Jason Richard Hunter`'s stage name is spelled incorrectly: it's currently spelled, `"Inspector deck"`, but it should be, [**`"Inspectah Deck"`**.](https://en.wikipedia.org/wiki/Inspectah_Deck)
+
+<!-- ![](https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Inspectah_Deck_in_Paris%2C_2013.jpg/2560px-Inspectah_Deck_in_Paris%2C_2013.jpg){ width=50% height=50%} -->
+
+```{r inspectah_deck-jpg, fig.cap="https://en.wikipedia.org/wiki/Inspectah_Deck", fig.align='center', echo=FALSE, out.height='30%', out.width='30%'}
+knitr::include_graphics(path = "www/inspectah_deck.jpg")
+```
+
+
+- matrices and arrays  
+- lists  
+- data frames
+
+## Removal 
+
+### Removing multiple elements 
+
+- vectors  
+- matrices and arrays  
+- lists  
+- data frames
+  
+### Removing a single element
+
+- vectors  
+- matrices and arrays  
+- lists  
+- data frames
+
+## Recap 
+
+In this tutorial we've covered:
+
+1. The index brackets: `[` and `[[`  
+2. Using the dollar sign (`$`)   
+3. Extraction  
+    - Extracting multiple elements 
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames 
+    - Extracting a single element 
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames 
+4. Replacement  
+    - Replacing multiple elements 
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames
+    - Replacing a single element
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames
+5. Removal 
+    - Removing multiple elements 
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames
+    - Removing a single element
+      - vectors  
+      - matrices and arrays  
+      - lists  
+      - data frames

@@ -1,0 +1,44 @@
+url: https://mjfrigaard.github.io/sheetcheatR/
+template:
+  bootstrap: 5
+  bootswatch: united
+  theme: github-light
+  bslib:
+    primary: "#02577A"
+    code-color: "#007bff"
+    code-bg: "#EAE9EA"
+    base_font:
+      google: Ubuntu
+    heading_font:
+      google: Fira Sans Condensed
+    code_font:
+      google: Ubuntu Mono
+
+navbar:
+ components:
+   tutorials:
+    text: Tutorials
+    menu:
+    - text: Basics
+    - text: Intro to the command line
+      href: tutorials/command-line.html
+    - text: -------
+    - text: "R Basics"
+    - text: Atomic vectors
+      href: tutorials/atomic-vectors.html
+    - text: S3 vectors
+      href: tutorials/s3-vectors.html
+    - text: Rectangular data
+      href: tutorials/rectangles.html
+    - text: -------
+    - text: "Import"
+    - text: Importing data
+      href: tutorials/import.html
+    - text: -------
+    - text: "tidyverse"
+    - text: Manipulate data with dplyr (part 1)
+      href: tutorials/dplyr-p1.html
+    - text: Reshape data with tidyr (part 1)
+      href: tutorials/tidyr-p1.html
+    - text: Data visualization with ggplot2 (part 1)
+      href: tutorials/ggp2-p1.html

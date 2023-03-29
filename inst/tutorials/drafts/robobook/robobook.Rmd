@@ -1,0 +1,108 @@
+---
+title: ""
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+### `unique()`
+
+We previously learned that this is an `"integer"` (*a subtle hint for detecting integers is that they print to the screen without quotes*).
+
+The `unique()` function returns the distinct values in an object (i.e. *duplicate elements/rows removed*). To see how `unique()` works we'll use a vector of duplicate characters (`dups`)
+
+```{r prepare-dups, echo=FALSE}
+dups <- c("a", "a", "a", "b", "b", "b", "c", "c", "c")
+```
+
+```{r dups, exercise.setup="prepare-dups", exercise=TRUE, exercise.lines=3}
+# print dups to the screen
+dups
+```
+
+Use the `unique()` function below to get the distinct values in `dups`.
+
+```{r unique, exercise.setup="prepare-dups", exercise=TRUE, exercise.lines=3}
+# get the unique values in dups 
+unique()
+```
+
+
+```{r unique-solution}
+unique(dups)
+```
+
+```{r unique-check}
+gradethis::grade_this_code()
+```
+
+`unique()` removes the duplicate values for `"a"`, `"b"`, and `"c"`. 
+
+### `length()`
+
+Use the `length()` function on letters below: 
+
+```{r length, exercise=TRUE, exercise.lines=3}
+length()
+```
+
+```{r length-solution}
+length(letters)
+```
+
+```{r length-check}
+gradethis::grade_this_code()
+```
+
+`length()` returns a value that tells us how many elements are in `letters`. In the code chunk below, use `typeof()` to investigate the return value from `length()`: 
+
+```{r typeof-length, exercise=TRUE, exercise.lines=3}
+typeof(x = length(x = ))
+```
+
+```{r typeof-length-solution}
+typeof(x = length(x = letters))
+```
+
+```{r typeof-length-check}
+gradethis::grade_this_code()
+```
+
+### `str()`
+
+`str()` stands for structure, and returns multiple characteristics on the element we provide. Use `str()` on `letters` below:
+
+```{r structure, exercise=TRUE, exercise.lines=3}
+str()
+```
+
+```{r structure-solution}
+str(letters)
+```
+
+```{r structure-check}
+gradethis::grade_this_code()
+```
+
++ `chr` is the `class` or `type` (`"character"` in this case) 
+
++ `[1:26]` is the `length()` or indexed length of the object 
+
++ `"a" "b" "c" "d" "e" "f" "g" ...` an abbreviate transposed printing of the object (the amount that's printed depends on `options(width = )`). Experiment with different widths in the code block below:
+
+```{r options, exercise=TRUE, exercise.lines=4}
+# set multiple values to width
+options(width = )
+# check the structure of letters and notice the print width
+str(letters)
+```
+
+```{r reset-options, echo=FALSE}
+options(width = 70)
+```

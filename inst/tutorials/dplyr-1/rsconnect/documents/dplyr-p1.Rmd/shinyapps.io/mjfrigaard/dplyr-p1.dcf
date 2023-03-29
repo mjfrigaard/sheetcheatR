@@ -1,0 +1,14 @@
+name: dplyr-p1
+title: dplyr-p1
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7399673
+bundleId: 6434988
+url: https://mjfrigaard.shinyapps.io/dplyr-p1/
+when: 1666617827.25619
+lastSyncTime: 1666617827.2562
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: _stash.R

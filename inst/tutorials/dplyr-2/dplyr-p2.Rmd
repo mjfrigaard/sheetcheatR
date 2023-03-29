@@ -1,0 +1,52 @@
+---
+title: "Data transformation with dplyr"
+description: >
+  Wrangle your data with dplyr (part 2).
+output: 
+  learnr::tutorial:
+    highlight: tango
+    theme: bootstrap
+    ace_theme: dracula
+    progressive: true
+    allow_skip: true
+    df_print: paged
+
+runtime: shiny_prerendered
+---
+
+```{r setup, include = FALSE}
+library(learnr)
+library(tidyverse)
+library(googlesheets4)
+library(skimr)
+library(knitr)
+library(readxl)
+library(reactable)
+library(writexl)
+library(openxlsx)
+library(datapasta)
+library(gt)
+library(flextable)
+knitr::opts_chunk$set(
+  upload.fun = imgur_upload, 
+  error = TRUE,
+  exercise.cap = "dplyr")
+```
+
+## Manipulate Cases
+
+### Extract Cases
+
+> *Row functions return a subset of rows as a new table.*
+
+### Arrange cases
+
+### Add cases
+
+## Manipulate Variables
+
+### Extract variables
+
+### Manipulate multiple variables at once
+
+### Make new variables 

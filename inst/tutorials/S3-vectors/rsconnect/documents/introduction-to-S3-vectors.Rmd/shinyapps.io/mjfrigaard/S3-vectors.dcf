@@ -1,0 +1,14 @@
+name: S3-vectors
+title: S3-vectors
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7147705
+bundleId: 6354554
+url: https://mjfrigaard.shinyapps.io/S3-vectors/
+when: 1664516123.69874
+lastSyncTime: 1664516123.69876
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: introduction-to-S3-vectors.html

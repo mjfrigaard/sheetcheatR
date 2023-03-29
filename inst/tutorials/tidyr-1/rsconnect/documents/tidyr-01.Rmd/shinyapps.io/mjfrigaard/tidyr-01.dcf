@@ -1,0 +1,14 @@
+name: tidyr-01
+title: tidyr-01
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7384582
+bundleId: 6429072
+url: https://mjfrigaard.shinyapps.io/tidyr-01/
+when: 1666406509.81828
+lastSyncTime: 1666406509.8183
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: tidyr-01.html

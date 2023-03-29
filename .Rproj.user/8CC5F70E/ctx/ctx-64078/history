@@ -1,0 +1,512 @@
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan + yellow + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.5) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.5) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan + yellow + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan + yellow + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan + yellow + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+both_dotplots <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot' + method = 'dotdensity' (binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan | yellow / both_dotplots + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+compare_dot_bin_methods <- function() {
+cyan + yellow / both_dotplots + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+compare_dot_bin_methods <- function() {
+both_dotplots / cyan + yellow  + patchwork::plot_layout(ncol = 2)
+}
+compare_dot_bin_methods()
+compare_dot_bin_methods <- function() {
+cyan | yellow  / both_dotplots
+}
+compare_dot_bin_methods()
+compare_dot_bin_methods <- function() {
+cyan / yellow  | both_dotplots
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 0.9) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 0.9) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+both_dotplots <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 0.9) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 0.9) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot' + method = 'dotdensity' (binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan / yellow  | both_dotplots
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 0.7) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 0.7) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+both_dotplots <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot' + method = 'dotdensity' (binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan / yellow  | both_dotplots
+}
+compare_dot_bin_methods()
+cyan <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 0.8) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+yellow <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 0.8) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'dotdensity', binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+both_dotplots <- ggplot(data = mpg, mapping = aes(x = hwy)) +
+geom_dotplot(method = "histodot",
+binwidth = 0.6, fill = "#00ffff", alpha = 1/2, dotsize = 1.3) +
+geom_dotplot(method = "dotdensity",
+binwidth = 0.6, fill = "#ffd319", alpha = 1/2, dotsize = 1.3) +
+scale_y_continuous(NULL, breaks = NULL) +
+labs(title = "method = 'histodot' + method = 'dotdensity' (binwidth = 0.6") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+compare_dot_bin_methods <- function() {
+cyan / yellow  | both_dotplots
+}
+compare_dot_bin_methods()
+rmarkdown::shiny_prerendered_clean("inst/tutorials/ggp2-01/ggp2-01.Rmd")
+unlink("inst/tutorials/ggp2-01/ggp2-01_cache", recursive = TRUE)
+usethis::use_r("ggp2_p1")
+small_labs <- theme(plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel")
+penguins <- palmerpenguins::penguins
+data_ranges <- data.frame(
+# add/subtract three years to either side of date
+x = c(min(economics$date) - 1095, max(economics$date) + 1095),
+# add/subtract 20% from unemploy
+y = c(min(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+)
+# plot with x/y using data values
+gg_a <- ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+labs(title = "orginal data", subtitle = " ") +
+small_labs
+# plot with x/y using data_ranges
+gg_blnk <- ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+geom_blank(data = data_ranges, aes(x = x, y = y)) +
+labs(
+title = "geom_blank(data = data_ranges, aes(x = x, y = y))",
+subtitle = "data_ranges <- data.frame(x = c('1964-07-01', '2018-03-31'),
+y = c(2148, 18422.4))"
+) +
+small_labs
+show_geom_blanks <- function() {
+gg_a / gg_blnk
+}
+show_geom_blanks
+show_geom_blanks()
+rmarkdown::shiny_prerendered_clean("inst/tutorials/ggp2-01/ggp2-01.Rmd")
+unlink("inst/tutorials/ggp2-01/ggp2-01_cache", recursive = TRUE)
+devtools::install_github("csgillespie/roxygen2Comment")
+library(roxygen2Comment)
+# packages ----------------------------------------------------------------
+library(learnr)
+library(tidyverse)
+library(skimr)
+library(knitr)
+library(vroom)
+library(faux)
+library(patchwork)
+library(palmerpenguins)
+penguins <- palmerpenguins::penguins
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+# GRAPHICAL PRIMITIVES  ---------------------------------------------------
+## graph a solution ----
+ggplot(
+data = economics, # data
+mapping = aes(x = date, y = unemploy)
+)
+## geom_blank --------------------------------------------------------------
+### data_ranges -----
+data_ranges <- data.frame(
+# add/subtract three years to either side of date
+x = c(min(economics$date) - 1095, max(economics$date) + 1095),
+# add/subtract 20% from unemploy
+y = c(min(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+)
+## geom_blank-solution -----
+ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+geom_blank(data = data_ranges, aes(x = x, y = y))
+## show_geom_blanks --------
+data_ranges <- data.frame(
+# add/subtract three years to either side of date
+x = c(min(economics$date) - 1095, max(economics$date) + 1095),
+# add/subtract 20% from unemploy
+y = c(min(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+)
+# plot with x/y using data values
+gg_a <- ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+labs(title = "orginal data: geom_point()", subtitle = " ") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+# plot with x/y using data_ranges
+gg_blnk <- ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+geom_blank(data = data_ranges, aes(x = x, y = y)) +
+labs(
+title = "geom_blank(data = data_ranges, aes(x = x, y = y))",
+subtitle = "data_ranges <- data.frame(x = c('1964-07-01', '2018-03-31'),
+y = c(2148, 18422.4))"
+) +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+show_geom_blanks <- function() {
+gg_a / gg_blnk
+}
+show_geom_blanks
+## expand_limits -----------------------------------------------------------
+## x/y limits ----
+x_limits <- c(min(economics$date) - 1095, max(economics$date) + 1095)
+y_limits <- c(max(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+## expand_limits-solution ------
+ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+expand_limits(
+# add limits
+x = x_limits,
+y = y_limits
+)
+gg_exp_lmt <- ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)
+) +
+geom_point() +
+expand_limits(
+# add limits
+x = x_limits,
+y = y_limits
+) +
+labs(
+title = "expand_limits(x = c('1964-07-01', '2018-03-31'),
+y = c(12281.6, 18422.4)",
+subtitle = " "
+) +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel"
+)
+show_expand_limits <- function() {
+gg_exp_lmt / gg_blnk | gg_a
+}
+show_expand_limits()
+class(gg_a)
+str(gg_a)
+typeof(gg_a)
+unclass(gg_a)
+names(unclass(gg_a))
+names(str(gg_a))
+names(unclass(gg_a))
+dput(class(gg_a))
+(class(gg_a)
+class(gg_a)
+class(gg_a)
+ggplot(
+data = economics,
+mapping = aes(x = date, y = unemploy)) +
+geom_polygon(mapping = aes(alpha = 50), show.legend = FALSE)
+# add/subtract three years to either side of date
+date_limits <- c(min(economics$date) - 1095, max(economics$date) + 1095)
+# add/subtract 20% from unemploy
+unemploy_limits <- c(min(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+ggplot(data = economics,
+mapping = aes(x = date, y = unemploy)) +
+geom_point() +
+geom_blank(aes(x = date_limits, y = unemploy_limits))
+date_limits
+## geom_blank --------------------------------------------------------------
+# add/subtract three years to either side of date
+date_limits <- c(x = min(economics$date) - 1095, max(economics$date) + 1095)
+date_limits
+# add/subtract 20% from unemploy
+unemploy_limits <- c(y = min(economics$unemploy) * .80, max(economics$unemploy) * 1.20)
+ggplot(data = economics,
+mapping = aes(x = date, y = unemploy)) +
+geom_point() +
+geom_blank(aes(x = date_limits, y = unemploy_limits))
+mod_coeffs <- coef(lm(bill_length_mm ~ flipper_length_mm,
+data = penguins))
+mod_coeffs
+names(mod_coeffs)
+mod_coeffs["(Intercept)"]
+mod_coeffs["flipper_length_mm"]
+ggplot(
+data = penguins,
+mapping = aes(x = flipper_length_mm, y = bill_length_mm)
+) +
+geom_point() +
+geom_abline(aes(intercept = mod_coeffs["(Intercept)"],
+slope = mod_coeffs["flipper_length_mm"]))
+## show_ablines ----
+gg_penguins_abline <- ggplot(data = penguins,
+mapping = aes(x = flipper_length_mm, y = bill_length_mm)) +
+geom_point(size = 0.4) +
+geom_abline(aes(intercept = -7.2648678, slope = 0.2547682)) +
+labs(
+title = "geom_abline(
+aes(intercept = -7.2648678, slope = 0.2547682))") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "bold.italic"),
+plot.title.position = "panel")
+gg_penguins_smooth <- ggplot(data = penguins,
+mapping = aes(x = flipper_length_mm, y = bill_length_mm)) +
+geom_point(size = 0.4) +
+geom_smooth(method = "lm") +
+labs(title = "geom_smooth(method = 'lm')") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "bold.italic"),
+plot.title.position = "panel")
+show_ablines <- function() {
+gg_penguins_abline / gg_penguins_smooth
+}
+show_ablines()
+gg_abline <- ggplot(data = seals,
+mapping = aes(x = long, y = lat)) +
+geom_abline(aes(intercept = 0, slope = 1), size = 0.2) +
+labs(title = "geom_abline()") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel")
+gg_hline <- ggplot(data = seals,
+mapping = aes(x = long, y = lat)) +
+geom_hline(aes(yintercept = lat), size = 0.2) +
+labs(title = "geom_hline()") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel")
+gg_vline <- ggplot(data = seals,
+mapping = aes(x = long, y = lat)) +
+geom_vline(aes(xintercept = long), size = 0.2) +
+labs(title = "geom_vline()") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel")
+gg_segment <- ggplot(data = seals,
+mapping = aes(x = long, y = lat)) +
+geom_segment(aes(yend = lat + 1, xend = long + 1), size = 0.2) +
+labs(title = "geom_segment()") +
+theme(
+plot.title = element_text(size = 8, face = "bold"),
+plot.subtitle = element_text(size = 7, face = "italic"),
+plot.title.position = "panel")
+show_lines <- function() {
+gg_abline + gg_hline + gg_vline + gg_segment + patchwork::plot_layout(ncol = 2)
+}
+show_lines()
+unlink("inst/tutorials/ggp2-01/ggp2-01_cache", recursive = TRUE)
+rmarkdown::shiny_prerendered_clean("inst/tutorials/ggp2-01/ggp2-01.Rmd")

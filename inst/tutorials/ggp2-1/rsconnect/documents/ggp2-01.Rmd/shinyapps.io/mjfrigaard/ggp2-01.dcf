@@ -1,0 +1,14 @@
+name: ggp2-01
+title: ggp2-01
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7333991
+bundleId: 6412778
+url: https://mjfrigaard.shinyapps.io/ggp2-01/
+when: 1666043902.8329
+lastSyncTime: 1666043902.83291
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: aes.Rmd|ggp2-01.html|ggp2-01.R|rnorm_multi.R

@@ -1,0 +1,14 @@
+name: command-line
+title: command-line
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7384528
+bundleId: 6429051
+url: https://mjfrigaard.shinyapps.io/command-line/
+when: 1666405614.35254
+lastSyncTime: 1666405614.35256
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: command-line.html

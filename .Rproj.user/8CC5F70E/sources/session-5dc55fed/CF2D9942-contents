@@ -1,0 +1,24 @@
+#### Atomic Vectors
+
+This is an introduction to R's foundational data object.
+
+#### S3 Vectors
+
+Factors, dates, datetimes, and difftimes.
+
+learnr::run_tutorial("atomic-vectors", package = "sheetcheatR") 
+
+learnr::run_tutorial("S3-vectors", package = "sheetcheatR") 
+
+Rectangular data in R
+
+Matrices, data.frames, tibbles, and data.tabes.
+
+learnr::run_tutorial("rectangles", package = "sheetcheatR")
+
+Command-Line Introduction*
+
+This tutorial covers basic command-line (Terminal) tools for navigating and managing files (cd, pwd, touch, echo, etc.), pipes, and downloading data
+
+learnr::run_tutorial("commandline", package = "sheetcheatR")
+

@@ -1,0 +1,14 @@
+name: rectangles
+title: rectangles
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7253372
+bundleId: 6383791
+url: https://mjfrigaard.shinyapps.io/rectangles/
+when: 1665287280.18853
+lastSyncTime: 1665287280.18856
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: _scatch.Rmd|introduction-to-rectangular-data.html

@@ -1,0 +1,14 @@
+name: import
+title: import
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5439375
+bundleId: 6427591
+url: https://mjfrigaard.shinyapps.io/import/
+when: 1666369745.03489
+lastSyncTime: 1666369745.03491
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: import.html

@@ -1,0 +1,14 @@
+name: data-import-with-readr-readxl-and-googlesheets4
+title: data-import-with-readr-readxl-and-googlesheets4
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7140411
+bundleId: 6344959
+url: https://mjfrigaard.shinyapps.io/data-import-with-readr-readxl-and-googlesheets4/
+when: 1664316688.69039
+lastSyncTime: 1664316688.69048
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: data-import-with-readr-readxl-and-googlesheets4.html|import.html

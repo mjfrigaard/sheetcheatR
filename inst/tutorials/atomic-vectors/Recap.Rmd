@@ -1,0 +1,91 @@
+---
+output: md_document
+---
+
+```{r setup, include=FALSE}
+library(rmdformats)
+library(tidyverse)
+library(skimr)
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,
+                      error = TRUE,
+                      fig.path = "www/",
+                      collapse = TRUE,
+                      warning = FALSE, 
+                      message = FALSE, 
+                      dpi = 320,
+                      tibble.max_extra_cols = 6, 
+                      tibble.width = 60)
+```
+
++----------------------------------------+--------------------------------------------------+
+| Topic                                  | Description                                      |
++========================================+==================================================+
+| ####  1. Creating vectors              | 1.1) `c()`                                       |
+|                                        |                                                  |
+|                                        | 1.2) `<-`                                        |
+|                                        |                                                  |
+|                                        | 1.3) Naming vectors                              |
+|                                        |                                                  |
+|                                        | 1.4) Creating logical vectors                    |
+|                                        |                                                  |
+|                                        | 1.5) Creating integer vectors                    |
+|                                        |                                                  |
+|                                        | 1.6) Creating double vectors                     |
+|                                        |                                                  |
+|                                        | 1.7) Creating character vectors                  |
+|                                        |                                                  |
+|                                        | 1.8) `rep()` and `seq()`                         |
++----------------------------------------+--------------------------------------------------+
+| #### 2. Combining vectors (coercion)   | 2.1) Vector coercion rules                       |
+|                                        |                                                  |
+|                                        | 2.2) Logical + integer coercion                  |
+|                                        |                                                  |
+|                                        | 2.3) Integer + double coercion                   |
+|                                        |                                                  |
+|                                        | 2.4) Character coercion                          |
+|                                        |                                                  |
+|                                        | 2.5) Missing values (`NA`) & `NA` coercion       |
++----------------------------------------+--------------------------------------------------+
+| #### 3. Vector types                   | 3.1) `is.<type>()` and `as.<type>()` functions   |
+|                                        |                                                  |
+|                                        | 3.2) Testing character vectors                   |
+|                                        |                                                  |
+|                                        | 3.3) Converting types                            |
+|                                        |                                                  |
+|                                        | 3.3) Testing numeric vectors                     |
+|                                        |                                                  |
+|                                        | 3.4) Testing integer vectors                     |
+|                                        |                                                  |
+|                                        | 3.5) Testing double vectors                      |
++----------------------------------------+--------------------------------------------------+
+| #### 4. Logical operations             | 4.1) Comparisons                                 |
+|                                        |                                                  |
+|                                        | 4.2) `any()`                                     |
+|                                        |                                                  |
+|                                        | 4.3) `all()`                                     |
+|                                        |                                                  |
+|                                        | 4.4) `which()`                                   |
+|                                        |                                                  |
+|                                        | 4.5) `sum()`                                     |
+|                                        |                                                  |
+|                                        | 4.6) Dealing with missing values (NA)            |
++----------------------------------------+--------------------------------------------------+
+| #### 5. Numerical operations           | 5.1) Summaries                                   |
+|                                        |                                                  |
+|                                        | 5.2) Named vectors                               |
+|                                        |                                                  |
+|                                        | 5.3) Assigning `names()` to numerical vectors    |
+|                                        |                                                  |
+|                                        | 5.3) Rounding numbers                            |
++----------------------------------------+--------------------------------------------------+
+| #### 6. Character operations           | 6.1) Combining characters                        |
+|                                        |                                                  |
+|                                        | 6.2) Separating pasted characters                |
+|                                        |                                                  |
+|                                        | 6.3) Collapsing pasted characters                |
+|                                        |                                                  |
+|                                        | 6.4) Paste, separate and collapse                |
++----------------------------------------+--------------------------------------------------+
+| #### 7. Recycling                      | 7.1) Recycling rules                             |
++----------------------------------------+--------------------------------------------------+

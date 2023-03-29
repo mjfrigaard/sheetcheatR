@@ -1,0 +1,29 @@
+Package: sheetcheatR
+Type: Package
+Title: Exercises for RStudio's cheatsheets.
+Version: 0.1.1
+Author: Martin Frigaard
+Maintainer: Martin Frigaard <mjfrigaard@pm.me>
+Description: This package contains learnr tutorials from RStudio's cheatsheets. 
+    Additional topics include command-line tools and workflow tips. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Imports: 
+    data.table,
+    dplyr,
+    glue,
+    learnr,
+    purrr,
+    reactable,
+    rsconnect,
+    rstudioapi,
+    shiny,
+    stringr,
+    vroom,
+    patchwork
+URL: https://mjfrigaard.github.io/sheetcheatR/
+Depends: 
+    R (>= 2.10)
